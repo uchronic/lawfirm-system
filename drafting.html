@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文书起草工作台 — 智法档案系统</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f2850;--blue:#1d6fa4;--sky:#e8f4fd;
+  --green:#16a34a;--red:#dc2626;--amber:#d97706;--purple:#7c3aed;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;
+  --gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;
+  --r:8px;--sh:0 1px 3px rgba(0,0,0,.1);--sh2:0 4px 12px rgba(0,0,0,.1);
+}
+body{font-family:'Microsoft YaHei',system-ui,sans-serif;background:var(--gray-50);color:var(--gray-800);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* Header */
+.hdr{background:var(--navy);height:52px;display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.hdr-logo{display:flex;align-items:center;gap:8px;color:#fff;font-size:15px;font-weight:600;text-decoration:none}
+.hdr-logo-box{width:30px;height:30px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.hdr-logo-box svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2}
+.hdr-sep{width:1px;height:20px;background:rgba(255,255,255,.2);margin:0 4px}
+.hdr-title{color:rgba(255,255,255,.85);font-size:14px}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.hdr-btn{background:rgba(255,255,255,.12);color:#fff;border:none;padding:5px 12px;border-radius:5px;font-size:12px;cursor:pointer;font-family:inherit;transition:.15s}
+.hdr-btn:hover{background:rgba(255,255,255,.22)}
+.hdr-btn.active{background:var(--blue)}
+
+/* Layout */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* Left panel — category + template list */
+.panel-left{width:260px;flex-shrink:0;background:#fff;border-right:1px solid var(--gray-200);display:flex;flex-direction:column;overflow:hidden}
+.panel-left-hdr{padding:14px 16px 10px;border-bottom:1px solid var(--gray-100)}
+.panel-left-hdr h3{font-size:13px;font-weight:600;color:var(--gray-700)}
+.search-box{position:relative;margin-top:8px}
+.search-box input{width:100%;padding:7px 10px 7px 30px;border:1px solid var(--gray-200);border-radius:6px;font-size:13px;font-family:inherit;outline:none;color:var(--gray-800)}
+.search-box input:focus{border-color:var(--blue)}
+.search-box svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--gray-400);fill:none;stroke-width:2}
+.cat-list{overflow-y:auto;flex:1;padding:8px 0}
+.cat-item{padding:0}
+.cat-head{display:flex;align-items:center;gap:8px;padding:7px 16px;cursor:pointer;font-size:13px;font-weight:600;color:var(--gray-700);user-select:none;transition:.1s}
+.cat-head:hover{background:var(--gray-50)}
+.cat-head .cat-icon{font-size:15px;width:22px;text-align:center}
+.cat-head .cat-arrow{margin-left:auto;font-size:10px;transition:.2s}
+.cat-item.open .cat-arrow{transform:rotate(90deg)}
+.tpl-list{display:none;padding:0 8px 4px}
+.cat-item.open .tpl-list{display:block}
+.tpl-btn{display:block;width:100%;text-align:left;padding:6px 10px;border-radius:5px;border:none;background:none;font-size:12px;color:var(--gray-600);cursor:pointer;font-family:inherit;transition:.1s}
+.tpl-btn:hover{background:var(--sky);color:var(--blue)}
+.tpl-btn.active{background:var(--sky);color:var(--blue);font-weight:500}
+
+/* Center panel — form */
+.panel-center{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.panel-center-hdr{padding:14px 20px 10px;border-bottom:1px solid var(--gray-200);background:#fff;flex-shrink:0;display:flex;align-items:center;gap:12px}
+.panel-center-hdr h2{font-size:15px;font-weight:600;color:var(--gray-800);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.panel-center-body{flex:1;overflow-y:auto;padding:16px 20px}
+
+/* Stage progress */
+.stages{display:flex;gap:0;margin-bottom:16px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--r);padding:10px 16px;align-items:center}
+.stage-item{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+.stage-item:last-child{flex:0;flex-shrink:0}
+.stage-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--gray-200);background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--gray-400);flex-shrink:0;transition:.2s}
+.stage-lbl{font-size:11px;color:var(--gray-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:.2s}
+.stage-line{flex:1;height:2px;background:var(--gray-200);margin:0 4px;min-width:8px;transition:.2s}
+.stage-item.done .stage-dot{background:var(--green);border-color:var(--green);color:#fff}
+.stage-item.done .stage-lbl{color:var(--green)}
+.stage-item.done + .stage-line, .stage-line.done{background:var(--green)}
+.stage-item.active .stage-dot{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 0 3px rgba(29,111,164,.15)}
+.stage-item.active .stage-lbl{color:var(--blue);font-weight:600}
+
+/* Form fields */
+.form-section{background:#fff;border:1px solid var(--gray-200);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.form-section-hdr{padding:10px 16px;border-bottom:1px solid var(--gray-100);font-size:13px;font-weight:600;color:var(--gray-700);display:flex;align-items:center;gap:6px}
+.form-section-body{padding:14px 16px;display:grid;gap:12px}
+.form-grid-2{grid-template-columns:1fr 1fr}
+.form-grid-3{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-label{font-size:12px;font-weight:500;color:var(--gray-600)}
+.required::after{content:' *';color:var(--red)}
+.form-control{padding:8px 10px;border:1px solid var(--gray-200);border-radius:5px;font-size:13px;font-family:inherit;color:var(--gray-800);outline:none;transition:.15s;background:#fff;width:100%}
+.form-control:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(29,111,164,.08)}
+textarea.form-control{resize:vertical;min-height:80px}
+.form-hint{font-size:11px;color:var(--gray-400)}
+
+/* Law refs */
+.law-refs{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.law-tag{background:#f0fdf4;color:#14532d;border:1px solid #bbf7d0;border-radius:4px;font-size:11px;padding:2px 7px}
+
+/* Action bar */
+.action-bar{padding:12px 20px;border-top:1px solid var(--gray-200);background:#fff;display:flex;gap:8px;align-items:center;flex-shrink:0}
+.btn{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-secondary{background:#fff;color:var(--gray-600);border:1px solid var(--gray-200)}
+.btn-secondary:hover{background:var(--gray-50)}
+.btn-purple{background:var(--purple);color:#fff}
+.btn-purple:hover{filter:brightness(1.08)}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-sm{padding:5px 12px;font-size:12px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--gray-300)}
+.status-dot.thinking{background:var(--amber);animation:pulse .8s infinite alternate}
+.status-dot.done{background:var(--green)}
+@keyframes pulse{to{opacity:.3}}
+.action-hint{font-size:12px;color:var(--gray-400);margin-left:4px}
+
+/* Right panel — AI output */
+.panel-right{width:420px;flex-shrink:0;background:#fff;border-left:1px solid var(--gray-200);display:flex;flex-direction:column;overflow:hidden}
+.panel-right-hdr{padding:14px 16px 10px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:8px}
+.panel-right-hdr h3{font-size:13px;font-weight:600;flex:1;color:var(--gray-700)}
+.panel-right-body{flex:1;overflow-y:auto;padding:14px 16px}
+.ai-stage-block{margin-bottom:16px}
+.ai-stage-title{font-size:12px;font-weight:600;color:var(--gray-500);padding:4px 0;border-bottom:1px solid var(--gray-100);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ai-stage-title .badge{font-size:10px;padding:1px 6px;border-radius:10px;font-weight:500}
+.badge-done{background:#d1fae5;color:#065f46}
+.badge-active{background:#dbeafe;color:#1e40af}
+.badge-pending{background:var(--gray-100);color:var(--gray-400)}
+.ai-content{font-size:13px;line-height:1.8;color:var(--gray-700);white-space:pre-wrap;word-break:break-all}
+.ai-content.streaming::after{content:'▌';animation:blink .6s infinite}
+@keyframes blink{50%{opacity:0}}
+.ai-placeholder{padding:40px 20px;text-align:center;color:var(--gray-400)}
+.ai-placeholder-icon{font-size:36px;margin-bottom:12px}
+.ai-placeholder p{font-size:13px;line-height:1.6}
+
+/* Notice */
+.notice{border-radius:6px;padding:10px 14px;font-size:12px;line-height:1.6;margin-bottom:12px}
+.notice-blue{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+.notice-amber{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+
+/* Empty state */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--gray-400);text-align:center;padding:40px}
+.empty-icon{font-size:48px;margin-bottom:16px}
+.empty-title{font-size:15px;font-weight:500;color:var(--gray-500);margin-bottom:6px}
+.empty-sub{font-size:13px;line-height:1.6}
+
+/* Export modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:10px;width:400px;box-shadow:var(--sh2)}
+.modal-hdr{padding:16px 20px 12px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between}
+.modal-hdr h3{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:20px;line-height:1;padding:2px 6px}
+.modal-body{padding:16px 20px}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--gray-200);display:flex;justify-content:flex-end;gap:8px}
+.export-opt{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--gray-200);border-radius:6px;margin-bottom:8px;cursor:pointer;transition:.1s}
+.export-opt:hover{border-color:var(--blue);background:var(--sky)}
+.export-opt input{accent-color:var(--blue)}
+.export-opt-icon{font-size:24px}
+.export-opt-info{flex:1}
+.export-opt-title{font-size:13px;font-weight:500}
+.export-opt-desc{font-size:11px;color:var(--gray-400)}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a class="hdr-logo" href="index.html">
+    <div class="hdr-logo-box"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+    智法档案系统
+  </a>
+  <div class="hdr-sep"></div>
+  <span class="hdr-title">文书起草工作台</span>
+  <div class="hdr-right">
+    <button class="hdr-btn" onclick="clearAll()">清空重置</button>
+    <button class="hdr-btn active" onclick="openExport()" id="exportBtn" disabled>导出文书</button>
+  </div>
+</header>
+
+<div class="layout">
+
+<!-- LEFT: Category + Template selector -->
+<div class="panel-left">
+  <div class="panel-left-hdr">
+    <h3>文书模板库</h3>
+    <div class="search-box">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="tplSearch" placeholder="搜索文书类型…" oninput="filterTpls(this.value)">
+    </div>
+  </div>
+  <div class="cat-list" id="catList"></div>
+</div>
+
+<!-- CENTER: Form -->
+<div class="panel-center">
+  <div class="panel-center-hdr">
+    <h2 id="formTitle">请从左侧选择文书类型</h2>
+    <div id="lawRefBox" style="display:none">
+      <div class="law-refs" id="lawRefs"></div>
+    </div>
+  </div>
+  <div class="panel-center-body" id="formBody">
+    <div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">选择一个文书模板开始起草</div>
+      <div class="empty-sub">从左侧选择文书类型<br>系统将自动加载对应的信息采集表单</div>
+    </div>
+  </div>
+  <div class="action-bar" id="actionBar" style="display:none">
+    <div class="status-dot" id="statusDot"></div>
+    <span class="action-hint" id="actionHint">填写完成后点击开始生成</span>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="btn btn-secondary btn-sm" onclick="prevStage()" id="btnPrev" disabled>← 上一步</button>
+      <button class="btn btn-purple btn-sm" onclick="runStage()" id="btnRun">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        AI 分析并生成
+      </button>
+      <button class="btn btn-green btn-sm" onclick="nextStage()" id="btnNext" disabled>下一步 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RIGHT: AI output -->
+<div class="panel-right">
+  <div class="panel-right-hdr">
+    <h3>AI 生成结果</h3>
+    <button class="btn btn-secondary btn-sm" onclick="copyResult()" id="copyBtn" style="display:none">复制</button>
+  </div>
+  <div class="panel-right-body" id="aiBody">
+    <div class="ai-placeholder">
+      <div class="ai-placeholder-icon">🤖</div>
+      <p>点击"AI 分析并生成"后<br>五阶段工作流将逐步在此显示结果</p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- Export modal -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h3>导出文书</h3>
+      <button class="modal-close" onclick="closeExport()">×</button>
+    </div>
+    <div class="modal-body">
+      <label class="export-opt">
+        <input type="radio" name="exportFmt" value="txt" checked>
+        <span class="export-opt-icon">📄</span>
+        <div class="export-opt-info">
+          <div class="export-opt-title">纯文本 (.txt)</div>
+          <div class="export-opt-desc">适合复制到 Word 后二次排版</div>
+        </div>
+      </label>
+      <label class="export-opt">
+        <input type="radio" name="exportFmt" value="md">
+        <span class="export-opt-icon">📝</span>
+        <div class="export-opt-info">
+          <div class="export-opt-title">Markdown (.md)</div>
+          <div class="export-opt-desc">保留标题层级，可用 md2word 转 docx</div>
+        </div>
+      </label>
+      <label class="export-opt">
+        <input type="radio" name="exportFmt" value="html">
+        <span class="export-opt-icon">🌐</span>
+        <div class="export-opt-info">
+          <div class="export-opt-title">HTML (.html)</div>
+          <div class="export-opt-desc">浏览器打印可输出格式化 PDF</div>
+        </div>
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeExport()">取消</button>
+      <button class="btn btn-primary" onclick="doExport()">下载</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Template catalog (from LexAI docgen_templates + SuitAgent Writer) ────────
+const CATEGORIES = [
+  { id:'litigation', name:'民事诉讼文书', icon:'⚖️', color:'#ef4444',
+    tpls:['民事起诉状','民事答辩状','上诉状','执行申请书','财产保全申请书','管辖权异议申请书','代理词','质证意见书'] },
+  { id:'criminal', name:'刑事辩护文书', icon:'🔒', color:'#6366f1',
+    tpls:['刑事辩护词','取保候审申请书','不予批捕意见书','减刑/假释申请书','刑事自诉状'] },
+  { id:'labor', name:'劳动争议文书', icon:'👷', color:'#0891b2',
+    tpls:['劳动仲裁申请书','劳动仲裁答辩书','解除劳动合同通知书','工资催告函','劳动关系确认申请书'] },
+  { id:'marriage', name:'婚姻家事文书', icon:'❤️', color:'#ec4899',
+    tpls:['离婚起诉状','离婚协议书','抚养权变更起诉状','抚养费起诉状','遗产继承起诉状','遗嘱'] },
+  { id:'debt', name:'债务纠纷文书', icon:'💰', color:'#f59e0b',
+    tpls:['民间借贷起诉状','催款函/律师函','支付令申请书','借条/欠条'] },
+  { id:'admin', name:'行政诉讼文书', icon:'🏛️', color:'#059669',
+    tpls:['行政诉讼起诉状','行政复议申请书','行政赔偿申请书'] },
+  { id:'arbitration', name:'仲裁文书', icon:'🔨', color:'#8b5cf6',
+    tpls:['仲裁申请书','仲裁答辩书','仲裁反请求书','仲裁代理词','撤销仲裁裁决申请书'] },
+  { id:'lawyer', name:'律师专用文书', icon:'💼', color:'#3b82f6',
+    tpls:['法律意见书','律师函','委托代理合同','授权委托书','法律尽职调查报告','结案报告','谈话笔录'] },
+];
+
+// Field definitions per template
+const TPL_FIELDS = {
+  '民事起诉状':{
+    law:['《民事诉讼法》','《民法典》'],
+    sections:[
+      { title:'当事人信息', grid:2, fields:[
+        {k:'plaintiff',l:'原告姓名/名称',r:true,ph:'原告全名'},
+        {k:'plaintiff_id',l:'原告身份证/统一社会信用代码',r:true,ph:'证件号码'},
+        {k:'plaintiff_addr',l:'原告住所地',r:true,ph:'详细地址'},
+        {k:'plaintiff_phone',l:'原告联系电话',r:true,ph:'手机号码'},
+        {k:'defendant',l:'被告姓名/名称',r:true,ph:'被告全名'},
+        {k:'defendant_addr',l:'被告住所地',r:true,ph:'详细地址'},
+      ]},
+      { title:'诉讼信息', grid:2, fields:[
+        {k:'court',l:'管辖法院',r:true,ph:'如：北京市朝阳区人民法院'},
+        {k:'case_type',l:'纠纷类型',r:true,ph:'如：合同纠纷/借贷纠纷'},
+        {k:'amount',l:'涉案金额（元）',r:false,ph:'如：100,000'},
+        {k:'evidence',l:'主要证据',r:false,ph:'如：合同、付款记录、聊天截图',ta:true},
+      ]},
+      { title:'诉讼内容', grid:1, fields:[
+        {k:'claims',l:'诉讼请求',r:true,ph:'如：1.判令被告偿还借款本金XX元及利息…',ta:true},
+        {k:'facts',l:'事实与理由',r:true,ph:'详细描述纠纷经过、违约事实及法律依据…',ta:true,large:true},
+      ]},
+    ]
+  },
+  '民事答辩状':{
+    law:['《民事诉讼法》','《民法典》'],
+    sections:[
+      { title:'答辩人信息', grid:2, fields:[
+        {k:'defendant',l:'答辩人（被告）',r:true,ph:'答辩人全名'},
+        {k:'defendant_id',l:'答辩人身份证/统一社会信用代码',r:true,ph:'证件号码'},
+        {k:'defendant_addr',l:'答辩人住所地',r:true,ph:'详细地址'},
+        {k:'plaintiff',l:'被答辩人（原告）',r:true,ph:'原告全名'},
+        {k:'case_no',l:'案号',r:true,ph:'如：（2025）京0105民初XXXX号'},
+        {k:'court',l:'审理法院',r:true,ph:'法院全称'},
+      ]},
+      { title:'答辩内容', grid:1, fields:[
+        {k:'defense_opinion',l:'答辩意见',r:true,ph:'逐条反驳原告诉讼请求及事实陈述…',ta:true,large:true},
+        {k:'evidence',l:'答辩证据',r:false,ph:'支持答辩意见的证据清单（选填）',ta:true},
+      ]},
+    ]
+  },
+  '上诉状':{
+    law:['《民事诉讼法》第164-168条'],
+    sections:[
+      { title:'上诉人信息', grid:2, fields:[
+        {k:'appellant',l:'上诉人',r:true,ph:'上诉人姓名/名称'},
+        {k:'appellant_id',l:'上诉人证件号',r:true,ph:'身份证号/统一社会信用代码'},
+        {k:'appellee',l:'被上诉人',r:true,ph:'被上诉人姓名/名称'},
+        {k:'original_case_no',l:'一审案号',r:true,ph:'如：（2025）京0105民初XXXX号'},
+        {k:'original_court',l:'一审法院',r:true,ph:'一审法院全称'},
+        {k:'appeal_court',l:'上诉法院',r:true,ph:'二审法院全称'},
+      ]},
+      { title:'上诉内容', grid:1, fields:[
+        {k:'appeal_claims',l:'上诉请求',r:true,ph:'如：1.撤销一审判决 2.改判被告承担全部责任…',ta:true},
+        {k:'appeal_reasons',l:'上诉理由',r:true,ph:'详细阐述不服一审判决的理由…',ta:true,large:true},
+      ]},
+    ]
+  },
+  '劳动仲裁申请书':{
+    law:['《劳动法》','《劳动合同法》','《劳动争议调解仲裁法》'],
+    sections:[
+      { title:'申请人信息', grid:2, fields:[
+        {k:'applicant',l:'申请人（劳动者）',r:true,ph:'申请人姓名'},
+        {k:'applicant_id',l:'申请人身份证号',r:true,ph:'18位身份证号'},
+        {k:'applicant_addr',l:'申请人住所地',r:true,ph:'详细地址'},
+        {k:'applicant_phone',l:'申请人联系电话',r:true,ph:'手机号码'},
+      ]},
+      { title:'被申请人信息', grid:2, fields:[
+        {k:'respondent',l:'被申请人（用人单位）',r:true,ph:'公司全称'},
+        {k:'respondent_addr',l:'被申请人住所地',r:true,ph:'公司注册地址'},
+        {k:'respondent_legal',l:'法定代表人',r:false,ph:'法人姓名（选填）'},
+        {k:'arb_committee',l:'仲裁委员会',r:true,ph:'如：北京市朝阳区劳动人事争议仲裁委员会'},
+        {k:'entry_date',l:'入职日期',r:true,ph:'如：2020年3月1日'},
+        {k:'exit_date',l:'离职日期',r:true,ph:'如：2025年4月1日'},
+      ]},
+      { title:'仲裁内容', grid:1, fields:[
+        {k:'claims',l:'仲裁请求',r:true,ph:'如：1.支付违法解除劳动合同赔偿金XX元 2.支付拖欠工资XX元…',ta:true},
+        {k:'facts',l:'事实与理由',r:true,ph:'详细描述劳动争议经过…',ta:true,large:true},
+        {k:'evidence',l:'证据清单',r:false,ph:'如：1.劳动合同 2.工资流水 3.解除通知书',ta:true},
+      ]},
+    ]
+  },
+  '离婚起诉状':{
+    law:['《民法典》婚姻家庭编','《民事诉讼法》'],
+    sections:[
+      { title:'当事人信息', grid:2, fields:[
+        {k:'plaintiff',l:'原告姓名',r:true,ph:'原告全名'},
+        {k:'plaintiff_id',l:'原告身份证号',r:true,ph:'18位身份证号'},
+        {k:'plaintiff_addr',l:'原告住所地',r:true,ph:'详细地址'},
+        {k:'defendant',l:'被告姓名',r:true,ph:'被告全名'},
+        {k:'defendant_addr',l:'被告住所地',r:true,ph:'详细地址'},
+        {k:'court',l:'管辖法院',r:true,ph:'如：北京市朝阳区人民法院'},
+      ]},
+      { title:'婚姻情况', grid:2, fields:[
+        {k:'marriage_date',l:'结婚日期',r:true,ph:'如：2015年6月1日'},
+        {k:'children',l:'子女情况',r:false,ph:'如：长子张XX，2016年出生'},
+      ]},
+      { title:'诉讼内容', grid:1, fields:[
+        {k:'claims',l:'诉讼请求',r:true,ph:'如：1.判决离婚 2.婚生子由原告抚养 3.依法分割夫妻共同财产…',ta:true},
+        {k:'facts',l:'离婚事由及婚姻状况',r:true,ph:'详细描述婚姻关系破裂的原因和经过…',ta:true,large:true},
+      ]},
+    ]
+  },
+  '民间借贷起诉状':{
+    law:['《民法典》合同编借款合同章','《最高人民法院关于审理民间借贷案件适用法律若干问题的规定》'],
+    sections:[
+      { title:'当事人信息', grid:2, fields:[
+        {k:'plaintiff',l:'原告（出借人）',r:true,ph:'原告全名'},
+        {k:'plaintiff_id',l:'原告证件号',r:true,ph:'身份证号/统一社会信用代码'},
+        {k:'plaintiff_addr',l:'原告住所地',r:true,ph:'详细地址'},
+        {k:'defendant',l:'被告（借款人）',r:true,ph:'被告全名'},
+        {k:'defendant_addr',l:'被告住所地',r:true,ph:'详细地址'},
+        {k:'court',l:'管辖法院',r:true,ph:'如：北京市朝阳区人民法院'},
+      ]},
+      { title:'借贷信息', grid:2, fields:[
+        {k:'loan_amount',l:'借款本金（元）',r:true,ph:'如：100,000'},
+        {k:'loan_date',l:'借款日期',r:true,ph:'如：2023年6月1日'},
+        {k:'repayment_date',l:'约定还款日期',r:true,ph:'如：2024年6月1日'},
+        {k:'interest_rate',l:'约定利率',r:true,ph:'如：年利率6%/未约定'},
+      ]},
+      { title:'诉讼内容', grid:1, fields:[
+        {k:'claims',l:'诉讼请求',r:true,ph:'如：1.偿还借款本金XX元 2.支付利息 3.承担诉讼费…',ta:true},
+        {k:'facts',l:'事实与理由',r:true,ph:'详细描述借贷经过及违约情况…',ta:true,large:true},
+        {k:'evidence',l:'证据清单',r:false,ph:'如：1.借条 2.转账记录 3.微信聊天记录',ta:true},
+      ]},
+    ]
+  },
+  '法律意见书':{
+    law:['相关专项法律法规'],
+    sections:[
+      { title:'委托信息', grid:2, fields:[
+        {k:'client',l:'委托方',r:true,ph:'委托方全名'},
+        {k:'law_firm',l:'出具律所',r:true,ph:'律师事务所全称'},
+        {k:'lawyer',l:'经办律师',r:true,ph:'律师姓名'},
+        {k:'opinion_date',l:'出具日期',r:true,ph:'如：2026年6月10日'},
+        {k:'subject',l:'意见主题',r:true,ph:'如：XX项目法律风险评估'},
+        {k:'case_type',l:'业务类型',r:true,ph:'如：股权并购/合同审查/投融资'},
+      ]},
+      { title:'意见正文', grid:1, fields:[
+        {k:'background',l:'项目背景',r:true,ph:'简述项目背景及委托事项…',ta:true},
+        {k:'materials',l:'查阅文件及资料',r:false,ph:'列出本次分析所依据的文件清单…',ta:true},
+        {k:'analysis',l:'法律分析与意见',r:true,ph:'分项分析各主要法律问题，说明法律依据及风险…',ta:true,large:true},
+        {k:'conclusion',l:'结论与建议',r:true,ph:'总结法律意见，提出具体建议…',ta:true},
+      ]},
+    ]
+  },
+  '律师函':{
+    law:['《民法典》','《民事诉讼法》'],
+    sections:[
+      { title:'发函信息', grid:2, fields:[
+        {k:'sender',l:'发函律所/发函人',r:true,ph:'律师事务所名称或律师姓名'},
+        {k:'sender_addr',l:'发函人地址',r:true,ph:'律所地址'},
+        {k:'lawyer',l:'经办律师',r:true,ph:'律师姓名'},
+        {k:'receiver',l:'收函人',r:true,ph:'收函方全名'},
+        {k:'receiver_addr',l:'收函人地址',r:true,ph:'详细地址'},
+        {k:'date',l:'发函日期',r:true,ph:'如：2026年6月10日'},
+      ]},
+      { title:'函件内容', grid:1, fields:[
+        {k:'subject',l:'事由',r:true,ph:'如：催告还款/侵权警告/合同违约催告'},
+        {k:'facts',l:'事实陈述',r:true,ph:'客观陈述相关事实经过…',ta:true},
+        {k:'demands',l:'要求事项',r:true,ph:'明确要求对方采取的行动及期限…',ta:true},
+        {k:'consequences',l:'逾期后果',r:false,ph:'如：将依法追究法律责任，包括但不限于向法院提起诉讼…',ta:true},
+      ]},
+    ]
+  },
+  '委托代理合同':{
+    law:['《律师法》','《民法典》合同编'],
+    sections:[
+      { title:'委托方信息', grid:2, fields:[
+        {k:'client',l:'委托人',r:true,ph:'委托方全名'},
+        {k:'client_id',l:'委托人证件号',r:true,ph:'身份证号/统一社会信用代码'},
+        {k:'client_phone',l:'委托人联系电话',r:true,ph:'手机号码'},
+        {k:'client_addr',l:'委托人地址',r:true,ph:'详细地址'},
+      ]},
+      { title:'律所信息', grid:2, fields:[
+        {k:'law_firm',l:'受托律师事务所',r:true,ph:'律师事务所全称'},
+        {k:'lawyer',l:'承办律师',r:true,ph:'律师姓名'},
+        {k:'lawyer_cert',l:'律师执业证号',r:false,ph:'执业证号（选填）'},
+        {k:'law_firm_addr',l:'律所地址',r:true,ph:'律所地址'},
+      ]},
+      { title:'委托事项', grid:1, fields:[
+        {k:'case_subject',l:'案件/事务名称',r:true,ph:'如：王某与李某房屋买卖合同纠纷'},
+        {k:'scope',l:'代理权限',r:true,ph:'如：代理一审诉讼全程，含开庭、调解等',ta:true},
+        {k:'fee',l:'代理费用',r:true,ph:'如：一次性收取代理费XX元，庭前支付XX元'},
+        {k:'period',l:'委托期限',r:true,ph:'如：自签订之日起至案件一审终结'},
+      ]},
+    ]
+  },
+  '授权委托书':{
+    law:['《民事诉讼法》','《民法典》'],
+    sections:[
+      { title:'委托方信息', grid:2, fields:[
+        {k:'principal',l:'委托人',r:true,ph:'委托方全名'},
+        {k:'principal_id',l:'委托人证件号',r:true,ph:'身份证号/统一社会信用代码'},
+        {k:'principal_addr',l:'委托人住所地',r:true,ph:'详细地址'},
+      ]},
+      { title:'受托人信息', grid:2, fields:[
+        {k:'agent',l:'受托人（代理人）',r:true,ph:'律师姓名/代理人姓名'},
+        {k:'agent_cert',l:'受托人证件号',r:true,ph:'律师执业证号/身份证号'},
+        {k:'law_firm',l:'所在律师事务所',r:false,ph:'律所名称（选填）'},
+      ]},
+      { title:'授权内容', grid:1, fields:[
+        {k:'case_subject',l:'代理事务',r:true,ph:'如：代理本人在（2025）京0105民初XXXX号案件中的一审诉讼'},
+        {k:'authority_scope',l:'代理权限',r:true,ph:'特别授权/一般授权，具体权限…',ta:true},
+        {k:'period',l:'授权期限',r:true,ph:'如：自签署之日起至案件一审终结'},
+      ]},
+    ]
+  },
+  '刑事辩护词':{
+    law:['《刑事诉讼法》','《律师法》'],
+    sections:[
+      { title:'案件信息', grid:2, fields:[
+        {k:'defendant',l:'被告人',r:true,ph:'被告人姓名'},
+        {k:'charge',l:'指控罪名',r:true,ph:'如：故意伤害罪、诈骗罪'},
+        {k:'case_no',l:'案号',r:true,ph:'公诉案号'},
+        {k:'court',l:'审理法院',r:true,ph:'法院全称'},
+        {k:'lawyer',l:'辩护律师',r:true,ph:'律师姓名'},
+        {k:'law_firm',l:'律师事务所',r:true,ph:'律所名称'},
+      ]},
+      { title:'辩护内容', grid:1, fields:[
+        {k:'defense_points',l:'辩护要点',r:true,ph:'列出主要辩护意见（如：罪名不成立/量刑过重/从轻情节…）',ta:true},
+        {k:'defense_body',l:'辩护意见详述',r:true,ph:'逐点展开辩护理由，引用证据及法律条文…',ta:true,large:true},
+        {k:'conclusion',l:'辩护结论',r:true,ph:'请求法院依法作出的判决…',ta:true},
+      ]},
+    ]
+  },
+  '财产保全申请书':{
+    law:['《民事诉讼法》第100-105条'],
+    sections:[
+      { title:'申请人信息', grid:2, fields:[
+        {k:'applicant',l:'申请人',r:true,ph:'申请人全名'},
+        {k:'applicant_id',l:'申请人证件号',r:true,ph:'身份证号/统一社会信用代码'},
+        {k:'respondent',l:'被申请人',r:true,ph:'被申请人全名'},
+        {k:'respondent_addr',l:'被申请人住所地',r:true,ph:'详细地址'},
+        {k:'court',l:'管辖法院',r:true,ph:'法院全称'},
+        {k:'preservation_type',l:'保全类型',r:true,ph:'诉前财产保全/诉讼财产保全'},
+      ]},
+      { title:'保全内容', grid:2, fields:[
+        {k:'preservation_target',l:'保全标的',r:true,ph:'如：被申请人名下XX银行账户存款'},
+        {k:'preservation_amount',l:'保全金额（元）',r:true,ph:'如：500,000'},
+        {k:'guarantee',l:'担保情况',r:true,ph:'如：提供XX万元现金担保'},
+        {k:'reasons',l:'申请理由',r:true,ph:'说明为何需要采取保全措施，存在何种紧迫风险…',ta:true},
+      ]},
+    ]
+  },
+  '谈话笔录':{
+    law:['内部文件'],
+    sections:[
+      { title:'基本信息', grid:2, fields:[
+        {k:'client',l:'当事人姓名',r:true,ph:'委托方全名'},
+        {k:'client_id',l:'当事人证件号',r:false,ph:'身份证号（选填）'},
+        {k:'lawyer',l:'接谈律师',r:true,ph:'律师姓名'},
+        {k:'date',l:'接谈日期',r:true,ph:'如：2026年6月10日'},
+        {k:'location',l:'接谈地点',r:false,ph:'如：律所会议室（选填）'},
+        {k:'case_type',l:'案件类型',r:true,ph:'如：合同纠纷/劳动争议/刑事辩护'},
+      ]},
+      { title:'案情记录', grid:1, fields:[
+        {k:'facts',l:'当事人陈述',r:true,ph:'记录当事人讲述的案情经过…',ta:true,large:true},
+        {k:'documents',l:'提交材料',r:false,ph:'当事人提交或描述的相关材料清单（选填）',ta:true},
+        {k:'attorney_advice',l:'律师初步意见',r:false,ph:'律师给出的初步法律意见（选填）',ta:true},
+        {k:'next_steps',l:'后续安排',r:false,ph:'如：补充材料、签署委托合同、开展调查等',ta:true},
+      ]},
+    ]
+  },
+};
+
+// Five-stage workflow prompts (adapted from StanlySGY)
+const STAGE_DEFS = [
+  { id:'extract', name:'要素提取', icon:'🔍',
+    prompt: fields => `你是一位资深中国诉讼律师助手。请从以下案件信息中提取并整理关键要素：\n\n${fields}\n\n请按以下结构输出：\n\n## 当事人信息\n（逐项列出各方当事人及其角色）\n\n## 关键事实时间线\n| 时间 | 事件 |\n|------|------|\n\n## 核心诉求\n（简明列出委托方的主要诉求）\n\n## 证据清单（已知）\n（列出已知证据及证明目的）\n\n## 待补充信息\n（指出哪些关键信息尚未提供）\n\n---\n⚠️ 说明：不确定的法条标注[待查]，不编造案例。` },
+  { id:'analyze', name:'法律分析', icon:'⚖️',
+    prompt: fields => `你是一位资深中国诉讼律师助手。请基于以下案件信息进行深度法律分析：\n\n${fields}\n\n请分析以下维度：\n\n## 法律关系定性\n（本案涉及的法律关系类型及各方权利义务）\n\n## 适用法律条文\n（列出本案可能适用的法律、条文及司法解释）\n\n## 有利因素\n（对委托方有利的事实和法律依据）\n\n## 风险与不利因素\n（潜在的法律风险和不利因素）\n\n## 需人工核验事项\n（需律师复核的关键判断）` },
+  { id:'focus', name:'争议焦点', icon:'🎯',
+    prompt: fields => `你是一位资深中国诉讼律师助手。请梳理以下案件的争议焦点：\n\n${fields}\n\n请输出：\n\n## 核心争议焦点\n（按重要性排列，每个焦点包含：争议描述 / 各方可能主张 / 相关法律依据 / 胜诉可能性初步评估）\n\n## 次要争议焦点\n\n## 诉讼策略建议\n（基于以上分析的初步策略方向）\n\n## 需人工核验事项` },
+  { id:'draft', name:'文书生成', icon:'📝',
+    prompt: (fields, tplName) => `你是一位专业的中国法律文书起草律师。请依据以下案件信息，起草一份完整的${tplName}：\n\n${fields}\n\n要求：\n- 格式规范，符合中国法院/仲裁机构的文书格式标准\n- 诉讼请求表述精确，逻辑严密\n- 法律条文引用准确（不确定的标注[待查]）\n- 语言正式、专业，符合法律文书行文习惯\n- 按照文书标准结构完整输出全文\n\n请输出完整文书正文：` },
+  { id:'review', name:'审查优化', icon:'✅',
+    prompt: (_, __, draft) => `你是一位法律文书审查专家。请对以下法律文书进行全面审查并提供优化版本：\n\n${draft}\n\n请从以下维度审查：\n\n## 形式审查\n- 文书格式是否规范\n- 结构是否完整\n- 法律术语使用是否准确\n\n## 实体审查\n- 事实认定是否准确\n- 法律适用是否正确\n- 论证逻辑是否严密\n- 诉讼请求是否合法合理\n\n## 修改意见\n（列出具体修改建议及理由）\n\n## 优化后文书\n（提供经过修改优化的完整文书）` },
+];
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let currentTpl = null;
+let currentStage = 0;
+let stageResults = {};  // {stageId: text}
+let isRunning = false;
+
+// ─── Build sidebar ─────────────────────────────────────────────────────────────
+function buildSidebar() {
+  const ul = document.getElementById('catList');
+  CATEGORIES.forEach(cat => {
+    const li = document.createElement('div');
+    li.className = 'cat-item';
+    li.id = 'cat-' + cat.id;
+    const head = `<div class="cat-head" onclick="toggleCat('${cat.id}')">
+      <span class="cat-icon">${cat.icon}</span>
+      <span>${cat.name}</span>
+      <span class="cat-arrow">▶</span>
+    </div>`;
+    const tplItems = cat.tpls.map(t =>
+      `<button class="tpl-btn" id="tplbtn-${esc(t)}" onclick="selectTpl('${esc(t)}')">${t}</button>`
+    ).join('');
+    li.innerHTML = head + `<div class="tpl-list">${tplItems}</div>`;
+    ul.appendChild(li);
+  });
+}
+
+function esc(s) { return s.replace(/'/g,"&#39;").replace(/ /g,'_'); }
+
+function toggleCat(id) {
+  const el = document.getElementById('cat-' + id);
+  el.classList.toggle('open');
+}
+
+function filterTpls(q) {
+  q = q.toLowerCase();
+  CATEGORIES.forEach(cat => {
+    let hasMatch = false;
+    cat.tpls.forEach(t => {
+      const btn = document.getElementById('tplbtn-' + esc(t));
+      if (!btn) return;
+      const show = !q || t.includes(q);
+      btn.style.display = show ? '' : 'none';
+      if (show) hasMatch = true;
+    });
+    const catEl = document.getElementById('cat-' + cat.id);
+    if (q && hasMatch) catEl.classList.add('open');
+    catEl.style.display = (!q || hasMatch) ? '' : 'none';
+  });
+}
+
+// ─── Select template ──────────────────────────────────────────────────────────
+function selectTpl(tplKey) {
+  const tplName = tplKey.replace(/_/g,' ');
+  document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('tplbtn-' + tplKey);
+  if (btn) btn.classList.add('active');
+
+  currentTpl = tplName;
+  currentStage = 0;
+  stageResults = {};
+
+  const def = TPL_FIELDS[tplName];
+  document.getElementById('formTitle').textContent = tplName;
+
+  // Law refs
+  if (def && def.law && def.law.length) {
+    document.getElementById('lawRefBox').style.display = '';
+    document.getElementById('lawRefs').innerHTML = def.law.map(l => `<span class="law-tag">📖 ${l}</span>`).join('');
+  } else {
+    document.getElementById('lawRefBox').style.display = 'none';
+  }
+
+  // Build form
+  const body = document.getElementById('formBody');
+  if (!def) {
+    body.innerHTML = `<div class="notice notice-amber">该文书类型暂无预置表单，请在下方描述案件信息后直接点击 AI 生成。</div>
+      <div class="form-section"><div class="form-section-body form-grid-1">
+        <div class="form-group"><label class="form-label required">案件信息描述</label>
+        <textarea class="form-control" id="freetext" style="min-height:200px" placeholder="请详细描述案件背景、当事人信息、争议焦点、诉求等…"></textarea></div>
+      </div></div>`;
+  } else {
+    body.innerHTML = buildStageProgress() + def.sections.map(sec => buildSection(sec)).join('');
+  }
+
+  document.getElementById('actionBar').style.display = 'flex';
+  document.getElementById('exportBtn').disabled = true;
+  updateStageUI();
+  resetAiPanel();
+}
+
+function buildStageProgress() {
+  return `<div class="stages">` +
+    STAGE_DEFS.map((s, i) => {
+      const cls = i === 0 ? 'stage-item active' : 'stage-item';
+      const line = i < STAGE_DEFS.length - 1 ? '<div class="stage-line"></div>' : '';
+      return `<div class="${cls}" id="stage-${s.id}"><div class="stage-dot">${i+1}</div><span class="stage-lbl">${s.name}</span></div>${line}`;
+    }).join('') + `</div>`;
+}
+
+function buildSection(sec) {
+  const gridCls = sec.grid === 3 ? 'form-grid-3' : sec.grid === 2 ? 'form-grid-2' : 'form-grid-1';
+  const fields = sec.fields.map(f => {
+    const lbl = `<label class="form-label ${f.r?'required':''}">${f.l}</label>`;
+    const ctrl = f.ta
+      ? `<textarea class="form-control" id="f_${f.k}" placeholder="${f.ph||''}" style="${f.large?'min-height:130px':''}"></textarea>`
+      : `<input class="form-control" id="f_${f.k}" type="text" placeholder="${f.ph||''}">`;
+    return `<div class="form-group">${lbl}${ctrl}</div>`;
+  }).join('');
+  return `<div class="form-section">
+    <div class="form-section-hdr">${sec.title}</div>
+    <div class="form-section-body ${gridCls}">${fields}</div>
+  </div>`;
+}
+
+// ─── Stage flow ───────────────────────────────────────────────────────────────
+function gatherFields() {
+  const def = TPL_FIELDS[currentTpl];
+  if (!def) {
+    const ft = document.getElementById('freetext');
+    return ft ? ft.value : '';
+  }
+  const parts = [];
+  def.sections.forEach(sec => {
+    sec.fields.forEach(f => {
+      const el = document.getElementById('f_' + f.k);
+      const v = el ? el.value.trim() : '';
+      if (v) parts.push(`【${f.l}】${v}`);
+    });
+  });
+  return parts.join('\n');
+}
+
+function updateStageUI() {
+  STAGE_DEFS.forEach((s, i) => {
+    const el = document.getElementById('stage-' + s.id);
+    if (!el) return;
+    el.classList.remove('active','done');
+    if (i < currentStage) { el.classList.add('done'); el.querySelector('.stage-dot').textContent = '✓'; }
+    else if (i === currentStage) { el.classList.add('active'); el.querySelector('.stage-dot').textContent = i+1; }
+    else el.querySelector('.stage-dot').textContent = i+1;
+  });
+  // Lines
+  document.querySelectorAll('.stage-line').forEach((ln, i) => {
+    ln.classList.toggle('done', i < currentStage);
+    ln.style.background = i < currentStage ? 'var(--green)' : 'var(--gray-200)';
+  });
+  document.getElementById('btnPrev').disabled = currentStage === 0 || isRunning;
+  document.getElementById('btnNext').disabled = !stageResults[STAGE_DEFS[currentStage]?.id] || isRunning;
+  const hint = document.getElementById('actionHint');
+  hint.textContent = isRunning ? STAGE_DEFS[currentStage].name + ' 分析中…' : `第 ${currentStage+1}/${STAGE_DEFS.length} 步：${STAGE_DEFS[currentStage]?.name}`;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot' + (isRunning ? ' thinking' : stageResults[STAGE_DEFS[currentStage]?.id] ? ' done' : '');
+}
+
+async function runStage() {
+  if (isRunning) return;
+  const stageDef = STAGE_DEFS[currentStage];
+  const fields = gatherFields();
+  if (!fields.trim() && currentStage === 0) { alert('请先填写案件信息'); return; }
+
+  isRunning = true;
+  updateStageUI();
+  document.getElementById('btnRun').disabled = true;
+  document.getElementById('copyBtn').style.display = 'none';
+
+  // Build prompt
+  let prompt;
+  if (currentStage === 4) {
+    const draft = stageResults['draft'] || stageResults['focus'] || fields;
+    prompt = stageDef.prompt(fields, currentTpl, draft);
+  } else if (currentStage === 3) {
+    prompt = stageDef.prompt(fields, currentTpl);
+  } else {
+    prompt = stageDef.prompt(fields);
+  }
+
+  // Show stage block in AI panel
+  renderAiPanel(stageDef, '');
+  const contentEl = document.getElementById('ai-content-' + stageDef.id);
+
+  // Call local Ollama (Qwen)
+  let result = '';
+  try {
+    const resp = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'qwen3:latest',
+        prompt,
+        stream: true,
+        options: { temperature: 0.3, num_ctx: 8192 }
+      })
+    });
+    if (!resp.ok) throw new Error('Ollama HTTP ' + resp.status);
+    const reader = resp.body.getReader();
+    const dec = new TextDecoder();
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      const chunk = dec.decode(value);
+      chunk.split('\n').forEach(line => {
+        if (!line.trim()) return;
+        try {
+          const j = JSON.parse(line);
+          if (j.response) {
+            result += j.response;
+            if (contentEl) contentEl.textContent = result;
+          }
+        } catch(e){}
+      });
+    }
+    if (contentEl) { contentEl.classList.remove('streaming'); }
+  } catch(e) {
+    // Fallback: mock response for demo
+    result = mockResponse(stageDef.id, currentTpl, fields);
+    if (contentEl) { contentEl.textContent = result; contentEl.classList.remove('streaming'); }
+  }
+
+  stageResults[stageDef.id] = result;
+  isRunning = false;
+  document.getElementById('btnRun').disabled = false;
+  document.getElementById('copyBtn').style.display = '';
+  if (currentStage === STAGE_DEFS.length - 1) {
+    document.getElementById('exportBtn').disabled = false;
+  }
+  updateStageUI();
+}
+
+function prevStage() { if (currentStage > 0) { currentStage--; updateStageUI(); scrollAiToStage(STAGE_DEFS[currentStage].id); } }
+function nextStage() {
+  if (currentStage < STAGE_DEFS.length - 1 && stageResults[STAGE_DEFS[currentStage].id]) {
+    currentStage++;
+    updateStageUI();
+    scrollAiToStage(STAGE_DEFS[currentStage].id);
+  }
+}
+
+function scrollAiToStage(id) {
+  const el = document.getElementById('ai-block-' + id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ─── AI panel rendering ────────────────────────────────────────────────────────
+function renderAiPanel(stageDef, text) {
+  const body = document.getElementById('aiBody');
+  let block = document.getElementById('ai-block-' + stageDef.id);
+  if (!block) {
+    block = document.createElement('div');
+    block.className = 'ai-stage-block';
+    block.id = 'ai-block-' + stageDef.id;
+    body.appendChild(block);
+  }
+  block.innerHTML = `<div class="ai-stage-title">
+    ${stageDef.icon} ${stageDef.name}
+    <span class="badge badge-active">生成中</span>
+  </div>
+  <div class="ai-content streaming" id="ai-content-${stageDef.id}">${text}</div>`;
+  block.scrollIntoView({behavior:'smooth', block:'start'});
+  if (body.querySelector('.ai-placeholder')) body.querySelector('.ai-placeholder').remove();
+}
+
+function resetAiPanel() {
+  document.getElementById('aiBody').innerHTML = `<div class="ai-placeholder">
+    <div class="ai-placeholder-icon">🤖</div>
+    <p>点击"AI 分析并生成"后<br>五阶段工作流将逐步在此显示结果</p>
+  </div>`;
+  document.getElementById('copyBtn').style.display = 'none';
+}
+
+function copyResult() {
+  const all = Object.values(stageResults).join('\n\n---\n\n');
+  navigator.clipboard.writeText(all).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '已复制';
+    setTimeout(() => btn.textContent = '复制', 1500);
+  });
+}
+
+// ─── Mock responses for demo (when Ollama not available) ──────────────────────
+function mockResponse(stageId, tplName, fields) {
+  const demos = {
+    extract: `## 当事人信息\n- 委托方角色及信息已从表单采集\n- 对方当事人信息待核实\n\n## 关键事实时间线\n| 时间 | 事件 |\n|------|------|\n| 根据填写信息 | 案件事实发生 |\n\n## 核心诉求\n- 依据填写的诉讼请求内容\n\n## 待补充信息\n- 建议补充：对方当事人详细联系方式\n- 建议补充：完整证据材料清单\n\n⚠️ 此为演示响应，实际使用请连接 Ollama (Qwen3)`,
+    analyze: `## 法律关系定性\n本案涉及的法律关系需结合案件材料综合认定。\n\n## 适用法律条文\n- 《中华人民共和国民法典》相关条款\n- 相关司法解释\n\n## 有利因素\n- 需结合具体事实分析\n\n## 风险与不利因素\n- 需结合证据情况分析\n\n## 需人工核验事项\n- 关键法律条文的具体适用\n\n⚠️ 此为演示响应，实际使用请连接 Ollama (Qwen3)`,
+    focus: `## 核心争议焦点\n1. 主要法律争议点需结合案件材料认定\n\n## 诉讼策略建议\n- 建议以充分证据为核心构建论证体系\n\n## 需人工核验事项\n- 争议焦点认定需律师最终确认\n\n⚠️ 此为演示响应，实际使用请连接 Ollama (Qwen3)`,
+    draft: `# ${tplName}\n\n[此处为文书正文]\n\n## 当事人信息\n（根据填写内容自动填充）\n\n## 诉讼请求/主要内容\n（根据填写内容生成）\n\n## 事实与理由\n（根据填写内容展开论述）\n\n此致\n[相关机构]\n\n具状人：___________\n日期：___________\n\n⚠️ 此为演示响应，实际使用请连接 Ollama (Qwen3)`,
+    review: `## 形式审查\n✅ 文书格式基本规范\n✅ 结构完整\n⚠️ 部分法律条文需进一步核实\n\n## 实体审查\n✅ 事实陈述逻辑清晰\n⚠️ 诉讼请求金额计算建议复核\n\n## 修改建议\n1. 建议补充具体违约时间节点\n2. 利息计算方式建议明确依据\n\n## 优化后文书\n（经审查，文书整体质量达到提交标准，建议律师最终审核后使用）\n\n⚠️ 此为演示响应，实际使用请连接 Ollama (Qwen3)`,
+  };
+  return demos[stageId] || '生成完成（演示模式）';
+}
+
+// ─── Export ────────────────────────────────────────────────────────────────────
+function openExport() { if (!document.getElementById('exportBtn').disabled) document.getElementById('exportModal').classList.add('open'); }
+function closeExport() { document.getElementById('exportModal').classList.remove('open'); }
+
+function doExport() {
+  const fmt = document.querySelector('input[name="exportFmt"]:checked').value;
+  const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const name = `${date} ${currentTpl}`;
+  const draftResult = stageResults['draft'] || '';
+  const fullContent = Object.entries(stageResults)
+    .map(([k,v]) => { const s = STAGE_DEFS.find(d=>d.id===k); return `# ${s?s.icon+' '+s.name:k}\n\n${v}`; })
+    .join('\n\n---\n\n');
+
+  if (fmt === 'md') {
+    download(name + '.md', fullContent, 'text/markdown');
+  } else if (fmt === 'html') {
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${name}</title>
+<style>body{font-family:'Microsoft YaHei',sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.8}
+h1{border-bottom:2px solid #0f2850;padding-bottom:8px}h2{color:#1d6fa4}hr{border-color:#e5e7eb;margin:24px 0}
+</style></head><body><h1>${currentTpl}</h1><p style="color:#9ca3af;font-size:13px">生成时间：${new Date().toLocaleString('zh-CN')}</p><hr>
+${fullContent.replace(/\n/g,'<br>').replace(/#{3} (.+)/g,'<h3>$1</h3>').replace(/#{2} (.+)/g,'<h2>$1</h2>').replace(/# (.+)/g,'<h1>$1</h1>')}
+</body></html>`;
+    download(name + '.html', html, 'text/html');
+  } else {
+    const txt = Object.entries(stageResults)
+      .map(([k,v]) => { const s = STAGE_DEFS.find(d=>d.id===k); return `【${s?s.name:k}】\n\n${v}`; })
+      .join('\n\n================\n\n');
+    download(name + '.txt', txt, 'text/plain');
+  }
+  closeExport();
+}
+
+function download(filename, content, mime) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], {type: mime+';charset=utf-8'}));
+  a.download = filename;
+  a.click();
+}
+
+function clearAll() {
+  currentTpl = null; currentStage = 0; stageResults = {};
+  document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('formTitle').textContent = '请从左侧选择文书类型';
+  document.getElementById('lawRefBox').style.display = 'none';
+  document.getElementById('formBody').innerHTML = `<div class="empty-state">
+    <div class="empty-icon">📋</div>
+    <div class="empty-title">选择一个文书模板开始起草</div>
+    <div class="empty-sub">从左侧选择文书类型<br>系统将自动加载对应的信息采集表单</div>
+  </div>`;
+  document.getElementById('actionBar').style.display = 'none';
+  document.getElementById('exportBtn').disabled = true;
+  resetAiPanel();
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+buildSidebar();
+</script>
+</body>
+</html>
