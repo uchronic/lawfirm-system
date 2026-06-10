@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案件委托登记 — 智法档案系统</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f2850;--blue:#1d6fa4;--sky:#e8f4fd;
+  --green:#16a34a;--red:#dc2626;--amber:#d97706;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-400:#9ca3af;--gray-600:#4b5563;--gray-800:#1f2937;
+  --radius:8px;--shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+}
+body{font-family:'Microsoft YaHei',system-ui,sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh}
+
+/* Header */
+.site-header{background:var(--navy);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:34px;height:34px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2}
+.logo-text{color:#fff;font-size:16px;font-weight:600;letter-spacing:.5px}
+.header-badge{background:rgba(255,255,255,.15);color:#fff;font-size:12px;padding:4px 10px;border-radius:20px}
+
+/* Progress bar */
+.progress-wrap{background:#fff;border-bottom:1px solid var(--gray-200);padding:16px 0}
+.progress-inner{max-width:780px;margin:0 auto;padding:0 24px}
+.steps{display:flex;align-items:center;gap:0}
+.step{display:flex;align-items:center;flex:1}
+.step:last-child{flex:0}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--gray-200);background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gray-400);flex-shrink:0;transition:.2s}
+.step-label{font-size:12px;color:var(--gray-400);margin-left:8px;white-space:nowrap;transition:.2s}
+.step-line{flex:1;height:2px;background:var(--gray-200);margin:0 8px;transition:.2s}
+.step.done .step-dot{background:var(--green);border-color:var(--green);color:#fff}
+.step.done .step-label{color:var(--green)}
+.step.done .step-line{background:var(--green)}
+.step.active .step-dot{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 0 4px rgba(29,111,164,.15)}
+.step.active .step-label{color:var(--blue);font-weight:600}
+
+/* Main layout */
+.main{max-width:780px;margin:32px auto 80px;padding:0 24px}
+
+/* Card */
+.card{background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+.card-header{padding:20px 24px 16px;border-bottom:1px solid var(--gray-100)}
+.card-title{font-size:17px;font-weight:600;color:var(--gray-800);display:flex;align-items:center;gap:8px}
+.card-title .icon{width:22px;height:22px;background:var(--sky);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.card-title .icon svg{width:14px;height:14px;stroke:var(--blue);fill:none;stroke-width:2}
+.card-subtitle{font-size:13px;color:var(--gray-400);margin-top:4px}
+.card-body{padding:20px 24px}
+
+/* Step pages */
+.step-page{display:none}
+.step-page.active{display:block}
+
+/* Case type selector */
+.type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.type-card{border:2px solid var(--gray-200);border-radius:var(--radius);padding:18px 12px;text-align:center;cursor:pointer;transition:.15s;background:#fff;position:relative}
+.type-card:hover{border-color:var(--blue);background:var(--sky)}
+.type-card.selected{border-color:var(--blue);background:var(--sky)}
+.type-card.selected::after{content:'✓';position:absolute;top:6px;right:8px;font-size:12px;color:var(--blue);font-weight:700}
+.type-icon{font-size:26px;margin-bottom:8px}
+.type-name{font-size:14px;font-weight:600;color:var(--gray-800)}
+.type-desc{font-size:11px;color:var(--gray-400);margin-top:4px;line-height:1.4}
+
+/* Form elements */
+.form-row{display:grid;gap:16px;margin-bottom:16px}
+.form-row.cols-2{grid-template-columns:1fr 1fr}
+.form-row.cols-3{grid-template-columns:1fr 1fr 1fr}
+.form-row.cols-1{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:13px;font-weight:500;color:var(--gray-600)}
+.required::after{content:' *';color:var(--red);font-weight:400}
+.form-control{padding:9px 12px;border:1px solid var(--gray-200);border-radius:6px;font-size:14px;font-family:inherit;color:var(--gray-800);transition:.15s;outline:none;background:#fff;width:100%}
+.form-control:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(29,111,164,.1)}
+.form-control::placeholder{color:var(--gray-400)}
+textarea.form-control{resize:vertical;min-height:90px}
+select.form-control{cursor:pointer}
+.form-hint{font-size:12px;color:var(--gray-400)}
+
+/* Section divider */
+.section-divider{display:flex;align-items:center;gap:10px;margin:20px 0 16px;font-size:13px;font-weight:600;color:var(--gray-600)}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+.section-divider::before{flex:0;width:0;display:none}
+.divider-line{flex:1;height:1px;background:var(--gray-200)}
+
+/* Upload area */
+.upload-area{border:2px dashed var(--gray-200);border-radius:var(--radius);padding:28px;text-align:center;cursor:pointer;transition:.15s;background:var(--gray-50)}
+.upload-area:hover{border-color:var(--blue);background:var(--sky)}
+.upload-icon{font-size:32px;margin-bottom:8px}
+.upload-title{font-size:14px;font-weight:500;color:var(--gray-800);margin-bottom:4px}
+.upload-hint{font-size:12px;color:var(--gray-400)}
+.upload-input{display:none}
+.file-list{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.file-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#fff;border:1px solid var(--gray-200);border-radius:6px;font-size:13px}
+.file-item-icon{color:var(--blue);flex-shrink:0}
+.file-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-item-size{color:var(--gray-400);font-size:12px;flex-shrink:0}
+.file-item-del{cursor:pointer;color:var(--gray-400);padding:2px 4px;border-radius:3px;transition:.1s;border:none;background:none;font-size:16px;line-height:1}
+.file-item-del:hover{color:var(--red);background:rgba(220,38,38,.08)}
+
+/* Conditional panels */
+.conditional-panel{display:none}
+.conditional-panel.show{display:block}
+
+/* Notice box */
+.notice{border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;font-size:13px;line-height:1.6}
+.notice-blue{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+.notice-amber{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.notice-green{background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d}
+.notice strong{font-weight:600}
+.notice ul{padding-left:16px;margin-top:6px}
+.notice li{margin-bottom:2px}
+
+/* Summary card */
+.summary-section{margin-bottom:20px}
+.summary-title{font-size:13px;font-weight:600;color:var(--navy);padding:8px 0;border-bottom:1px solid var(--gray-200);margin-bottom:12px}
+.summary-row{display:flex;font-size:13px;padding:5px 0;gap:12px}
+.summary-label{color:var(--gray-400);width:110px;flex-shrink:0}
+.summary-value{color:var(--gray-800);flex:1}
+.summary-tag{display:inline-block;background:var(--sky);color:var(--blue);font-size:12px;padding:2px 8px;border-radius:20px;font-weight:500}
+
+/* Nav buttons */
+.nav-bar{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:20px;border-top:1px solid var(--gray-200)}
+.btn{padding:10px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#1660910}
+.btn-primary:hover{filter:brightness(1.05)}
+.btn-secondary{background:#fff;color:var(--gray-600);border:1px solid var(--gray-200)}
+.btn-secondary:hover{background:var(--gray-50);border-color:var(--gray-400)}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{filter:brightness(1.05)}
+.btn-lg{padding:12px 32px;font-size:15px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* Checkbox group */
+.checkbox-group{display:flex;flex-wrap:wrap;gap:8px}
+.checkbox-item{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:5px 10px;border:1px solid var(--gray-200);border-radius:5px;transition:.15s}
+.checkbox-item:hover{border-color:var(--blue);background:var(--sky)}
+.checkbox-item input{accent-color:var(--blue);cursor:pointer}
+.checkbox-item.checked{border-color:var(--blue);background:var(--sky);color:var(--blue);font-weight:500}
+
+/* Success page */
+.success-hero{text-align:center;padding:48px 24px}
+.success-circle{width:80px;height:80px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:36px}
+.success-title{font-size:22px;font-weight:700;color:var(--gray-800);margin-bottom:8px}
+.success-sub{font-size:14px;color:var(--gray-400);line-height:1.6;margin-bottom:28px}
+.case-number-box{display:inline-block;background:var(--sky);border:1px solid #bfdbfe;border-radius:8px;padding:12px 24px;font-size:18px;font-weight:700;color:var(--blue);letter-spacing:1px;margin-bottom:28px}
+
+/* Validation */
+.form-control.invalid{border-color:var(--red);background:#fff5f5}
+.error-msg{font-size:12px;color:var(--red);margin-top:3px;display:none}
+.form-group.has-error .error-msg{display:block}
+.form-group.has-error .form-control{border-color:var(--red)}
+
+/* Radio group */
+.radio-group{display:flex;flex-wrap:wrap;gap:8px}
+.radio-item{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:6px 12px;border:1px solid var(--gray-200);border-radius:5px;transition:.15s}
+.radio-item:hover{border-color:var(--blue);background:var(--sky)}
+.radio-item input{accent-color:var(--blue);cursor:pointer}
+.radio-item.selected{border-color:var(--blue);background:var(--sky);color:var(--blue);font-weight:500}
+
+@media(max-width:600px){
+  .type-grid{grid-template-columns:repeat(2,1fr)}
+  .form-row.cols-2,.form-row.cols-3{grid-template-columns:1fr}
+  .steps{gap:0}.step-label{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="#">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <span class="logo-text">智法档案系统</span>
+  </a>
+  <span class="header-badge">当事人建档入口</span>
+</header>
+
+<!-- Progress -->
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="steps" id="progressSteps">
+      <div class="step active" data-step="1">
+        <div class="step-dot">1</div>
+        <span class="step-label">案件类型</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="2">
+        <div class="step-dot">2</div>
+        <span class="step-label">基本信息</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="3">
+        <div class="step-dot">3</div>
+        <span class="step-label">案情详情</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="4">
+        <div class="step-dot">4</div>
+        <span class="step-label">材料上传</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="5">
+        <div class="step-dot">5</div>
+        <span class="step-label">确认提交</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- ===== STEP 1: 案件类型 ===== -->
+<div class="step-page active" id="step1">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+        请选择案件类型
+      </div>
+      <div class="card-subtitle">根据您的案件性质选择对应类型，系统将为您展示对应的信息收集项</div>
+    </div>
+    <div class="card-body">
+      <div class="type-grid">
+        <div class="type-card" data-type="civil" onclick="selectType(this,'civil')">
+          <div class="type-icon">⚖️</div>
+          <div class="type-name">民事案件</div>
+          <div class="type-desc">合同纠纷、侵权损害、婚姻家庭、继承、劳动争议等</div>
+        </div>
+        <div class="type-card" data-type="criminal" onclick="selectType(this,'criminal')">
+          <div class="type-icon">🔒</div>
+          <div class="type-name">刑事案件</div>
+          <div class="type-desc">刑事辩护、刑事自诉、取保候审申请等</div>
+        </div>
+        <div class="type-card" data-type="commercial" onclick="selectType(this,'commercial')">
+          <div class="type-icon">🏢</div>
+          <div class="type-name">商事案件</div>
+          <div class="type-desc">公司股权、合同审查、商事仲裁、企业并购等</div>
+        </div>
+        <div class="type-card" data-type="admin" onclick="selectType(this,'admin')">
+          <div class="type-icon">🏛️</div>
+          <div class="type-name">行政案件</div>
+          <div class="type-desc">行政诉讼、行政复议、政府信息公开等</div>
+        </div>
+      </div>
+
+      <div class="nav-bar">
+        <div></div>
+        <button class="btn btn-primary" onclick="goStep(2)" id="step1Next" disabled>
+          下一步
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STEP 2: 基本信息 ===== -->
+<div class="step-page" id="step2">
+  <div class="notice notice-blue">
+    <strong>隐私声明：</strong>您填写的所有信息仅用于本律所办案，存储于本地加密服务器，不会上传至任何第三方云平台。
+  </div>
+
+  <!-- 委托人信息 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        委托人基本信息
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="form-row cols-2">
+        <div class="form-group" id="fg-name">
+          <label class="form-label required">姓名 / 企业名称</label>
+          <input class="form-control" id="f-name" type="text" placeholder="请输入真实姓名或企业全称">
+          <span class="error-msg">请填写姓名</span>
+        </div>
+        <div class="form-group" id="fg-idtype">
+          <label class="form-label required">证件类型</label>
+          <select class="form-control" id="f-idtype" onchange="toggleIdType()">
+            <option value="">请选择</option>
+            <option value="idcard">居民身份证</option>
+            <option value="passport">护照</option>
+            <option value="bizlicense">营业执照</option>
+            <option value="hkmacao">港澳通行证</option>
+            <option value="other">其他</option>
+          </select>
+          <span class="error-msg">请选择证件类型</span>
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group" id="fg-idno">
+          <label class="form-label required">证件号码</label>
+          <input class="form-control" id="f-idno" type="text" placeholder="请输入证件号码">
+          <span class="error-msg">请填写证件号码</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label required">联系电话</label>
+          <input class="form-control" id="f-phone" type="tel" placeholder="请输入手机号码">
+          <span class="error-msg" id="err-phone">请填写联系电话</span>
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">电子邮箱</label>
+          <input class="form-control" id="f-email" type="email" placeholder="用于接收案件进度通知（选填）">
+        </div>
+        <div class="form-group">
+          <label class="form-label required">委托人身份</label>
+          <select class="form-control" id="f-role">
+            <option value="">请选择</option>
+            <option value="plaintiff">原告 / 申请人</option>
+            <option value="defendant">被告 / 被申请人</option>
+            <option value="third">第三人</option>
+            <option value="criminal_defendant">刑事被告人家属</option>
+            <option value="victim">受害人 / 被害人</option>
+            <option value="company">企业法人代表</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row cols-1">
+        <div class="form-group">
+          <label class="form-label">通讯地址</label>
+          <input class="form-control" id="f-addr" type="text" placeholder="省/市/区/街道/门牌号（选填）">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 对方当事人 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        对方当事人信息
+      </div>
+      <div class="card-subtitle">如有多个对方当事人，请在后续沟通时补充</div>
+    </div>
+    <div class="card-body">
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label required">对方姓名 / 企业名称</label>
+          <input class="form-control" id="f-opp-name" type="text" placeholder="请输入对方真实姓名或企业全称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">对方联系方式</label>
+          <input class="form-control" id="f-opp-contact" type="text" placeholder="电话或地址（如已知）">
+        </div>
+      </div>
+
+      <!-- 商事特有：企业信息 -->
+      <div class="conditional-panel" id="cp-commercial-opp">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">对方统一社会信用代码</label>
+            <input class="form-control" id="f-opp-uscc" type="text" placeholder="18位统一社会信用代码（选填）">
+          </div>
+          <div class="form-group">
+            <label class="form-label">对方法定代表人</label>
+            <input class="form-control" id="f-opp-legal-rep" type="text" placeholder="公司法人（选填）">
+          </div>
+        </div>
+      </div>
+
+      <!-- 行政特有：行政机关信息 -->
+      <div class="conditional-panel" id="cp-admin-opp">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">行政机关名称</label>
+            <input class="form-control" id="f-admin-organ" type="text" placeholder="作出行政行为的机关全称">
+          </div>
+          <div class="form-group">
+            <label class="form-label">行政行为类型</label>
+            <select class="form-control" id="f-admin-act-type">
+              <option value="">请选择</option>
+              <option>行政处罚</option>
+              <option>行政许可</option>
+              <option>行政强制</option>
+              <option>行政复议</option>
+              <option>政府信息公开</option>
+              <option>其他行政行为</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goStep(1)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      上一步
+    </button>
+    <button class="btn btn-primary" onclick="validateStep2()">
+      下一步
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ===== STEP 3: 案情详情 ===== -->
+<div class="step-page" id="step3">
+
+  <!-- 通用：案情概述 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        案情经过
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label required">案件发生时间</label>
+          <input class="form-control" id="f-incident-date" type="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">案件发生地点</label>
+          <input class="form-control" id="f-incident-place" type="text" placeholder="省/市/区/具体地点">
+        </div>
+      </div>
+      <div class="form-row cols-1">
+        <div class="form-group" id="fg-facts">
+          <label class="form-label required">案件事实陈述</label>
+          <textarea class="form-control" id="f-facts" style="min-height:130px" placeholder="请尽量详细描述事情经过，包括：时间、地点、相关人员、发生了什么、造成了什么损失或后果……"></textarea>
+          <span class="error-msg">请简要描述案件经过</span>
+          <span class="form-hint">建议300字以上，描述越详细，律师分析越准确</span>
+        </div>
+      </div>
+      <div class="form-row cols-1">
+        <div class="form-group">
+          <label class="form-label required">您的诉求</label>
+          <textarea class="form-control" id="f-claim" style="min-height:80px" placeholder="您希望通过法律途径达到什么目的？例如：要求对方赔偿损失10万元、要求履行合同……"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 民事特有 -->
+  <div class="conditional-panel" id="cp-civil-details">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          民事案件补充信息
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">纠纷类型</label>
+            <select class="form-control" id="f-civil-type">
+              <option value="">请选择</option>
+              <option>合同纠纷</option>
+              <option>侵权损害赔偿</option>
+              <option>婚姻家庭</option>
+              <option>继承纠纷</option>
+              <option>房产纠纷</option>
+              <option>劳动争议</option>
+              <option>借贷纠纷</option>
+              <option>物权纠纷</option>
+              <option>其他民事纠纷</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">涉案金额（元）</label>
+            <input class="form-control" id="f-civil-amount" type="number" placeholder="如涉及财产，请填写争议金额">
+          </div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">是否已有判决/裁定</label>
+            <select class="form-control" id="f-civil-prior">
+              <option value="">请选择</option>
+              <option value="no">无，首次起诉</option>
+              <option value="first">一审判决，需上诉</option>
+              <option value="appeal">二审，需再审</option>
+              <option value="enforce">已判决，需申请执行</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">是否存在证据</label>
+            <select class="form-control" id="f-civil-evidence">
+              <option value="">请选择</option>
+              <option value="yes">有书面/电子证据</option>
+              <option value="partial">部分有证据</option>
+              <option value="no">证据不足</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 刑事特有 -->
+  <div class="conditional-panel" id="cp-criminal-details">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+          刑事案件补充信息
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="notice notice-amber">
+          <strong>提示：</strong>刑事案件涉及个人人身自由，请如实填写，律师将根据实际情况依法维权。
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">当前案件状态</label>
+            <select class="form-control" id="f-crim-status">
+              <option value="">请选择</option>
+              <option>当事人被拘留</option>
+              <option>当事人被逮捕</option>
+              <option>已取保候审</option>
+              <option>已移送起诉</option>
+              <option>一审开庭中</option>
+              <option>已判决，需上诉</option>
+              <option>服刑中，需减刑/假释</option>
+              <option>被害人，需追诉</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">涉嫌罪名（如已知）</label>
+            <input class="form-control" id="f-crim-charge" type="text" placeholder="如：故意伤害罪、诈骗罪等">
+          </div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">是否已会见当事人</label>
+            <select class="form-control" id="f-crim-meet">
+              <option value="">请选择</option>
+              <option value="yes">已会见</option>
+              <option value="no">尚未会见</option>
+              <option value="na">不适用（本人填写）</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">羁押/关押地点</label>
+            <input class="form-control" id="f-crim-location" type="text" placeholder="看守所/监狱名称（如已知）">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 商事特有 -->
+  <div class="conditional-panel" id="cp-commercial-details">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
+          商事案件补充信息
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">商事纠纷类型</label>
+            <select class="form-control" id="f-comm-type">
+              <option value="">请选择</option>
+              <option>买卖合同纠纷</option>
+              <option>服务合同纠纷</option>
+              <option>股权纠纷</option>
+              <option>公司解散</option>
+              <option>商事仲裁</option>
+              <option>知识产权纠纷</option>
+              <option>企业并购</option>
+              <option>破产重整</option>
+              <option>其他商事纠纷</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">是否存在合同文本</label>
+            <select class="form-control" id="f-comm-contract">
+              <option value="">请选择</option>
+              <option value="yes">有书面合同</option>
+              <option value="electronic">仅有电子协议</option>
+              <option value="verbal">口头约定，无书面合同</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">涉案金额（元）</label>
+            <input class="form-control" id="f-comm-amount" type="number" placeholder="合同金额或争议金额">
+          </div>
+          <div class="form-group">
+            <label class="form-label">是否已有仲裁/诉讼</label>
+            <select class="form-control" id="f-comm-prior">
+              <option value="">请选择</option>
+              <option value="none">尚未启动</option>
+              <option value="arbitration">已申请仲裁</option>
+              <option value="litigation">已提起诉讼</option>
+              <option value="both">仲裁与诉讼并行</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 行政特有 -->
+  <div class="conditional-panel" id="cp-admin-details">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          行政案件补充信息
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">行政行为作出时间</label>
+            <input class="form-control" id="f-admin-date" type="date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">是否已申请行政复议</label>
+            <select class="form-control" id="f-admin-reconsider">
+              <option value="">请选择</option>
+              <option value="no">未申请，直接诉讼</option>
+              <option value="pending">已申请，待结果</option>
+              <option value="denied">复议维持，需诉讼</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row cols-1">
+          <div class="form-group">
+            <label class="form-label">行政文书文号（如有）</label>
+            <input class="form-control" id="f-admin-docno" type="text" placeholder="行政处罚决定书、行政许可决定书等文号">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 补充意见 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        补充说明
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="form-row cols-1">
+        <div class="form-group">
+          <label class="form-label">其他需要说明的情况</label>
+          <textarea class="form-control" id="f-extra" placeholder="如有其他律师需了解的信息，请在此补充（选填）"></textarea>
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">期望委托方式</label>
+          <select class="form-control" id="f-engage-mode">
+            <option value="">请选择</option>
+            <option>代理诉讼（全程代理）</option>
+            <option>法律咨询（仅咨询）</option>
+            <option>合同审查</option>
+            <option>非诉讼法律服务</option>
+            <option>风险评估</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">期望首次会面时间</label>
+          <input class="form-control" id="f-meeting-date" type="date">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goStep(2)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      上一步
+    </button>
+    <button class="btn btn-primary" onclick="validateStep3()">
+      下一步
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ===== STEP 4: 材料上传 ===== -->
+<div class="step-page" id="step4">
+  <div class="notice notice-blue">
+    <strong>上传说明：</strong>支持 PDF、Word、图片（JPG/PNG）格式，每个文件不超过 20MB。材料越完整，律师分析越准确。
+  </div>
+
+  <!-- 通用材料 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        身份证明材料 <span style="font-size:12px;color:var(--gray-400);font-weight:400;margin-left:6px">必填</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="upload-area" onclick="triggerUpload('upload-id')">
+        <div class="upload-icon">📄</div>
+        <div class="upload-title">点击上传身份证明</div>
+        <div class="upload-hint">身份证正反面 / 营业执照扫描件</div>
+        <input type="file" class="upload-input" id="upload-id" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="handleUpload(this,'list-id')">
+      </div>
+      <div class="file-list" id="list-id"></div>
+    </div>
+  </div>
+
+  <!-- 案件相关材料 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
+        案件相关材料
+      </div>
+      <div class="card-subtitle" id="upload-hint-text">请上传与案件相关的证明文件、合同、聊天记录等</div>
+    </div>
+    <div class="card-body">
+      <!-- 民事/商事：合同协议 -->
+      <div class="conditional-panel" id="cp-upload-contract">
+        <div class="section-divider">合同 / 协议文件</div>
+        <div class="upload-area" onclick="triggerUpload('upload-contract')">
+          <div class="upload-icon">📋</div>
+          <div class="upload-title">点击上传合同文件</div>
+          <div class="upload-hint">合同原件、补充协议、修订版本等</div>
+          <input type="file" class="upload-input" id="upload-contract" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleUpload(this,'list-contract')">
+        </div>
+        <div class="file-list" id="list-contract"></div>
+      </div>
+
+      <!-- 刑事：司法文书 -->
+      <div class="conditional-panel" id="cp-upload-criminal">
+        <div class="section-divider">司法文书</div>
+        <div class="upload-area" onclick="triggerUpload('upload-judicial')">
+          <div class="upload-icon">⚖️</div>
+          <div class="upload-title">点击上传司法文书</div>
+          <div class="upload-hint">拘留证、逮捕证、起诉书、判决书等</div>
+          <input type="file" class="upload-input" id="upload-judicial" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleUpload(this,'list-judicial')">
+        </div>
+        <div class="file-list" id="list-judicial"></div>
+      </div>
+
+      <!-- 行政：行政文书 -->
+      <div class="conditional-panel" id="cp-upload-admin">
+        <div class="section-divider">行政文书</div>
+        <div class="upload-area" onclick="triggerUpload('upload-admin-doc')">
+          <div class="upload-icon">🏛️</div>
+          <div class="upload-title">点击上传行政文书</div>
+          <div class="upload-hint">行政处罚决定书、行政复议决定书等</div>
+          <input type="file" class="upload-input" id="upload-admin-doc" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleUpload(this,'list-admin-doc')">
+        </div>
+        <div class="file-list" id="list-admin-doc"></div>
+      </div>
+
+      <!-- 通用：证据材料 -->
+      <div class="section-divider">证据材料</div>
+      <div class="upload-area" onclick="triggerUpload('upload-evidence')">
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-title">点击上传证据材料</div>
+        <div class="upload-hint">聊天记录截图、付款凭证、照片、录音转录文件等</div>
+        <input type="file" class="upload-input" id="upload-evidence" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleUpload(this,'list-evidence')">
+      </div>
+      <div class="file-list" id="list-evidence"></div>
+
+      <!-- 通用：其他材料 -->
+      <div class="section-divider">其他补充材料</div>
+      <div class="upload-area" onclick="triggerUpload('upload-other')">
+        <div class="upload-icon">📎</div>
+        <div class="upload-title">点击上传其他材料</div>
+        <div class="upload-hint">其他任何有助于律师了解案情的文件</div>
+        <input type="file" class="upload-input" id="upload-other" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleUpload(this,'list-other')">
+      </div>
+      <div class="file-list" id="list-other"></div>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goStep(3)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      上一步
+    </button>
+    <button class="btn btn-primary" onclick="goStep(5)">
+      下一步，确认信息
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ===== STEP 5: 确认提交 ===== -->
+<div class="step-page" id="step5">
+  <div class="notice notice-amber">
+    <strong>提交前请仔细核对以下信息。</strong>提交后信息将进入律所档案系统，如需修改请联系接待律师。
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+        信息确认
+      </div>
+    </div>
+    <div class="card-body" id="summaryContent">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- 授权声明 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        委托声明与授权
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="notice notice-blue" style="margin-bottom:16px">
+        <strong>本律所隐私政策摘要：</strong>
+        <ul>
+          <li>您提供的所有信息仅用于本次法律委托服务</li>
+          <li>数据存储于本地加密服务器，不对外传输</li>
+          <li>未经您书面授权，不向任何第三方披露</li>
+          <li>案件结案后，档案按规定期限保存</li>
+        </ul>
+      </div>
+      <label class="checkbox-item" id="agree-checkbox" onclick="toggleAgree(this)" style="padding:12px 16px;border-radius:6px;display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+        <input type="checkbox" id="agree-check" style="margin-top:2px;flex-shrink:0">
+        <span style="font-size:13px;line-height:1.6">本人确认以上填写信息真实准确，授权贵律所处理本人案件相关信息，同意贵律所按照上述隐私政策使用本人数据，并了解本次填写提交不构成正式委托合同关系（正式委托需签署委托合同）。</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goStep(4)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      上一步
+    </button>
+    <button class="btn btn-success btn-lg" id="submitBtn" onclick="submitForm()" disabled>
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      确认提交建档
+    </button>
+  </div>
+</div>
+
+<!-- ===== STEP 6: 成功 ===== -->
+<div class="step-page" id="step6">
+  <div class="card">
+    <div class="success-hero">
+      <div class="success-circle">✓</div>
+      <div class="success-title">建档成功</div>
+      <div class="success-sub">您的案件信息已成功录入档案系统<br>律师将在1个工作日内与您联系</div>
+      <div class="case-number-box" id="caseNumberDisplay">ZF-2026-XXXXXX</div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-secondary" onclick="window.print()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          打印回执
+        </button>
+        <button class="btn btn-primary" onclick="location.reload()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          新建案件
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+let currentStep = 1;
+let selectedType = '';
+const typeLabels = {civil:'民事案件',criminal:'刑事案件',commercial:'商事案件',admin:'行政案件'};
+
+function selectType(el, type) {
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedType = type;
+  document.getElementById('step1Next').disabled = false;
+}
+
+function goStep(n) {
+  document.getElementById('step' + currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step' + n).classList.add('active');
+  updateProgress(n);
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  if (n === 3) showConditionalPanels();
+  if (n === 4) showUploadPanels();
+  if (n === 5) buildSummary();
+}
+
+function updateProgress(n) {
+  document.querySelectorAll('.step[data-step]').forEach(el => {
+    const s = parseInt(el.getAttribute('data-step'));
+    el.classList.remove('active','done');
+    if (s < n) el.classList.add('done');
+    if (s === n) el.classList.add('active');
+    // update dot text
+    const dot = el.querySelector('.step-dot');
+    if (s < n) dot.textContent = '✓';
+    else dot.textContent = s;
+  });
+  // update connector lines
+  const lines = document.querySelectorAll('.step-line');
+  lines.forEach((ln, i) => {
+    ln.style.background = (i < n - 1) ? 'var(--green)' : 'var(--gray-200)';
+  });
+}
+
+function showConditionalPanels() {
+  const panels = ['civil','criminal','commercial','admin'];
+  panels.forEach(t => {
+    const el = document.getElementById('cp-' + t + '-details');
+    if (el) el.classList.toggle('show', t === selectedType);
+  });
+  // opp panels
+  document.getElementById('cp-commercial-opp').classList.toggle('show', selectedType === 'commercial');
+  document.getElementById('cp-admin-opp').classList.toggle('show', selectedType === 'admin');
+}
+
+function showUploadPanels() {
+  document.getElementById('cp-upload-contract').classList.toggle('show', selectedType === 'civil' || selectedType === 'commercial');
+  document.getElementById('cp-upload-criminal').classList.toggle('show', selectedType === 'criminal');
+  document.getElementById('cp-upload-admin').classList.toggle('show', selectedType === 'admin');
+  const hints = {
+    civil:'请上传合同文件、付款凭证、通讯记录、裁定文书等',
+    criminal:'请上传司法文书、当事人身份证明、相关证据等',
+    commercial:'请上传合同文件、公司登记资料、往来函件等',
+    admin:'请上传行政文书、相关证据材料等'
+  };
+  document.getElementById('upload-hint-text').textContent = hints[selectedType] || '';
+}
+
+function triggerUpload(id) { document.getElementById(id).click(); }
+
+function handleUpload(input, listId) {
+  const list = document.getElementById(listId);
+  Array.from(input.files).forEach(f => {
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    const size = f.size < 1024*1024 ? (f.size/1024).toFixed(0)+'KB' : (f.size/1024/1024).toFixed(1)+'MB';
+    item.innerHTML = `<span class="file-item-icon">📄</span><span class="file-item-name">${f.name}</span><span class="file-item-size">${size}</span><button class="file-item-del" onclick="this.parentNode.remove()">×</button>`;
+    list.appendChild(item);
+  });
+  input.value = '';
+}
+
+function setError(fgId, show) {
+  const fg = document.getElementById(fgId);
+  if (!fg) return;
+  fg.classList.toggle('has-error', show);
+}
+
+function validateStep2() {
+  let ok = true;
+  const checks = [
+    ['fg-name','f-name'],['fg-idtype','f-idtype'],['fg-idno','f-idno']
+  ];
+  checks.forEach(([fg, fid]) => {
+    const v = document.getElementById(fid).value.trim();
+    setError(fg, !v);
+    if (!v) ok = false;
+  });
+  const phone = document.getElementById('f-phone').value.trim();
+  const phoneOk = /^1[3-9]\d{9}$/.test(phone) || phone.length >= 6;
+  document.getElementById('f-phone').closest('.form-group').classList.toggle('has-error', !phoneOk);
+  if (!phoneOk) ok = false;
+  if (ok) goStep(3);
+  else document.querySelector('.has-error')?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function validateStep3() {
+  let ok = true;
+  const date = document.getElementById('f-incident-date').value;
+  const facts = document.getElementById('f-facts').value.trim();
+  if (!facts) { setError('fg-facts', true); ok = false; }
+  else setError('fg-facts', false);
+  if (ok) goStep(4);
+  else document.querySelector('.has-error')?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function buildSummary() {
+  const g = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+  const roleMap = {plaintiff:'原告/申请人',defendant:'被告/被申请人',third:'第三人',
+    criminal_defendant:'刑事被告人家属',victim:'受害人/被害人',company:'企业法人代表'};
+  const html = `
+    <div class="summary-section">
+      <div class="summary-title">案件基本信息</div>
+      <div class="summary-row"><span class="summary-label">案件类型</span><span class="summary-value"><span class="summary-tag">${typeLabels[selectedType]||'—'}</span></span></div>
+    </div>
+    <div class="summary-section">
+      <div class="summary-title">委托人信息</div>
+      <div class="summary-row"><span class="summary-label">姓名/企业名称</span><span class="summary-value">${g('f-name')||'—'}</span></div>
+      <div class="summary-row"><span class="summary-label">证件号码</span><span class="summary-value">${maskId(g('f-idno'))}</span></div>
+      <div class="summary-row"><span class="summary-label">联系电话</span><span class="summary-value">${maskPhone(g('f-phone'))}</span></div>
+      <div class="summary-row"><span class="summary-label">委托人身份</span><span class="summary-value">${roleMap[g('f-role')]||g('f-role')||'—'}</span></div>
+    </div>
+    <div class="summary-section">
+      <div class="summary-title">对方当事人</div>
+      <div class="summary-row"><span class="summary-label">姓名/企业名称</span><span class="summary-value">${g('f-opp-name')||'—'}</span></div>
+    </div>
+    <div class="summary-section">
+      <div class="summary-title">案情概要</div>
+      <div class="summary-row"><span class="summary-label">案件发生时间</span><span class="summary-value">${g('f-incident-date')||'—'}</span></div>
+      <div class="summary-row"><span class="summary-label">发生地点</span><span class="summary-value">${g('f-incident-place')||'—'}</span></div>
+      <div class="summary-row"><span class="summary-label">委托方式</span><span class="summary-value">${g('f-engage-mode')||'—'}</span></div>
+      <div class="summary-row"><span class="summary-label">期望会面时间</span><span class="summary-value">${g('f-meeting-date')||'—'}</span></div>
+      <div class="summary-row"><span class="summary-label">案情陈述</span><span class="summary-value" style="white-space:pre-wrap;line-height:1.6">${truncate(g('f-facts'),120)}</span></div>
+    </div>`;
+  document.getElementById('summaryContent').innerHTML = html;
+}
+
+function maskId(v) {
+  if (!v || v.length < 8) return v || '—';
+  return v.slice(0,3) + '****' + v.slice(-4);
+}
+function maskPhone(v) {
+  if (!v || v.length < 7) return v || '—';
+  return v.slice(0,3) + '****' + v.slice(-4);
+}
+function truncate(s, n) {
+  if (!s) return '—';
+  return s.length > n ? s.slice(0,n) + '…' : s;
+}
+
+function toggleAgree(label) {
+  const cb = document.getElementById('agree-check');
+  setTimeout(() => {
+    document.getElementById('submitBtn').disabled = !cb.checked;
+    label.classList.toggle('checked', cb.checked);
+    label.style.borderColor = cb.checked ? 'var(--blue)' : 'var(--gray-200)';
+    label.style.background = cb.checked ? 'var(--sky)' : '';
+  }, 0);
+}
+
+function submitForm() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '提交中…';
+  // Generate case number
+  const now = new Date();
+  const yy = now.getFullYear();
+  const seq = Math.floor(Math.random()*900000+100000);
+  const typeCode = {civil:'MS',criminal:'XS',commercial:'SS',admin:'XZ'}[selectedType]||'OT';
+  const caseNo = `ZF-${yy}-${typeCode}${seq}`;
+  // Simulate submission delay
+  setTimeout(() => {
+    document.getElementById('caseNumberDisplay').textContent = caseNo;
+    goStep(6);
+  }, 1200);
+}
+
+function toggleIdType() {
+  // could customize placeholder based on id type
+}
+</script>
+</body>
+</html>
