@@ -518,7 +518,7 @@ body { font-family:'Microsoft YaHei',sans-serif; font-size:13px; color:var(--gra
         <span class="nav-icon">🤖</span> AI 分析报告
         <span class="nav-badge blue">3</span>
       </div>
-      <div class="nav-item" onclick="showPage('drafting', this)">
+      <div class="nav-item" onclick="window.open('drafting.html','_blank')">
         <span class="nav-icon">✍️</span> 文书起草
       </div>
       <div class="nav-item" onclick="showPage('contracts', this)">
@@ -1081,7 +1081,11 @@ body { font-family:'Microsoft YaHei',sans-serif; font-size:13px; color:var(--gra
       <div class="empty-state"><div class="icon">📂</div><p>档案库 · 开发中</p></div>
     </div>
     <div class="page-view" id="page-drafting">
-      <div class="empty-state"><div class="icon">✍️</div><p>文书起草工坊 · 开发中</p></div>
+      <div class="empty-state">
+        <div class="icon">✍️</div>
+        <p>正在跳转到文书起草工作台…</p>
+        <script>if(document.getElementById('page-drafting').classList.contains('active'))window.open('drafting.html','_blank');</script>
+      </div>
     </div>
     <div class="page-view" id="page-contracts">
       <div class="empty-state"><div class="icon">📋</div><p>合同审查模块 · 开发中</p></div>
