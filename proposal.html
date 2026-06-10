@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>律所智能档案管理系统 · 本地化部署方案</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+    font-size: 14px;
+    color: #1a1a2e;
+    background: #f5f6fa;
+    line-height: 1.7;
+  }
+
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+  }
+
+  /* Cover */
+  .cover {
+    background: linear-gradient(135deg, #0f2850 0%, #1a3d6b 60%, #0e5185 100%);
+    color: #fff;
+    padding: 80px 64px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 320px; height: 320px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 50%;
+  }
+  .cover-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #7eb8f7;
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .cover h1 {
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+  .cover h1 span {
+    color: #7eb8f7;
+  }
+  .cover-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 48px;
+  }
+  .cover-tags {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .cover-tag {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+  }
+  .cover-date {
+    position: absolute;
+    bottom: 40px;
+    right: 64px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* Sections */
+  .section {
+    padding: 52px 64px;
+    border-bottom: 1px solid #eef0f5;
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .section-num {
+    width: 36px; height: 36px;
+    background: #0f2850;
+    color: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f2850;
+  }
+
+  /* Intro */
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  .intro-card {
+    background: #f8f9fc;
+    border-left: 4px solid #0f2850;
+    padding: 20px 24px;
+    border-radius: 0 8px 8px 0;
+  }
+  .intro-card h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f2850;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .intro-card p {
+    font-size: 13px;
+    color: #4a5568;
+    line-height: 1.6;
+  }
+
+  /* Architecture */
+  .arch-box {
+    background: #0f2850;
+    color: #e8edf5;
+    border-radius: 12px;
+    padding: 32px 36px;
+    font-family: 'Courier New', monospace;
+    font-size: 12.5px;
+    line-height: 2;
+    overflow-x: auto;
+    margin-bottom: 28px;
+  }
+  .arch-box .arch-title {
+    color: #7eb8f7;
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .arch-box .c1 { color: #7eb8f7; }
+  .arch-box .c2 { color: #90ee90; }
+  .arch-box .c3 { color: #ffd700; }
+  .arch-box .c4 { color: #ff9999; }
+  .arch-box .c5 { color: #dda0dd; }
+
+  /* Module cards */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .module-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .module-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent);
+  }
+  .module-icon {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+  .module-card h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f2850;
+    margin-bottom: 8px;
+  }
+  .module-card p {
+    font-size: 12.5px;
+    color: #5a6a7e;
+    line-height: 1.6;
+  }
+
+  /* Privacy */
+  .privacy-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .privacy-card {
+    background: #f0f4ff;
+    border-radius: 10px;
+    padding: 22px 20px;
+    text-align: center;
+  }
+  .privacy-card .icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+  .privacy-card h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f2850;
+    margin-bottom: 6px;
+  }
+  .privacy-card p {
+    font-size: 12px;
+    color: #5a6a7e;
+    line-height: 1.5;
+  }
+  .privacy-note {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 8px;
+    padding: 14px 20px;
+    font-size: 13px;
+    color: #5d4037;
+  }
+  .privacy-note strong { color: #e65100; }
+
+  /* Hardware plans */
+  .plan-card {
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  }
+  .plan-header {
+    padding: 22px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .plan-header-left h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .plan-header-left .tagline {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+  }
+  .plan-price {
+    text-align: right;
+    color: #fff;
+  }
+  .plan-price .amount {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .plan-price .unit {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-top: 3px;
+  }
+  .plan-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    color: #fff;
+    margin-top: 8px;
+  }
+  .plan-body {
+    background: #fff;
+    padding: 0;
+  }
+
+  /* Hardware table */
+  .hw-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .hw-table thead {
+    background: #f7f8fa;
+  }
+  .hw-table th {
+    padding: 11px 20px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: #8a96a8;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 1px solid #eef0f5;
+  }
+  .hw-table td {
+    padding: 12px 20px;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f2f7;
+    vertical-align: top;
+  }
+  .hw-table tr:last-child td { border-bottom: none; }
+  .hw-table .col-cat {
+    font-weight: 600;
+    color: #0f2850;
+    white-space: nowrap;
+    width: 90px;
+  }
+  .hw-table .col-model {
+    color: #2d3748;
+  }
+  .hw-table .col-spec {
+    color: #5a6a7e;
+    font-size: 12px;
+  }
+  .hw-table .col-price {
+    text-align: right;
+    font-weight: 600;
+    color: #0f2850;
+    white-space: nowrap;
+    width: 110px;
+  }
+  .hw-table tr.total-row td {
+    background: #f8f9fc;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 14px 20px;
+    border-top: 2px solid #e2e8f0;
+  }
+  .hw-table tr.total-row .col-price {
+    font-size: 16px;
+    color: #c0392b;
+  }
+
+  /* Performance */
+  .perf-strip {
+    display: flex;
+    gap: 12px;
+    padding: 16px 20px;
+    background: #f8f9fc;
+    flex-wrap: wrap;
+  }
+  .perf-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: #4a5568;
+  }
+  .perf-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #27ae60;
+    flex-shrink: 0;
+  }
+  .perf-dot.yellow { background: #f39c12; }
+
+  /* Recommend badge */
+  .recommended-badge {
+    display: inline-block;
+    background: #ff6b35;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 4px;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  /* Tech stack */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .tech-card {
+    background: #f8f9fc;
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .tech-card .tech-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #8a96a8;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .tech-card .tech-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f2850;
+    margin-bottom: 4px;
+  }
+  .tech-card .tech-desc {
+    font-size: 11.5px;
+    color: #6b7a8d;
+    line-height: 1.5;
+  }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 36px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px; top: 8px; bottom: 8px;
+    width: 2px;
+    background: #e2e8f0;
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 28px;
+  }
+  .timeline-item:last-child { margin-bottom: 0; }
+  .timeline-dot {
+    position: absolute;
+    left: -30px;
+    top: 4px;
+    width: 20px; height: 20px;
+    background: #0f2850;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .timeline-item h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f2850;
+    margin-bottom: 6px;
+  }
+  .timeline-item .duration {
+    font-size: 11px;
+    background: #e8edf5;
+    color: #0f2850;
+    padding: 2px 10px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .timeline-item ul {
+    padding-left: 16px;
+    margin-top: 6px;
+  }
+  .timeline-item li {
+    font-size: 13px;
+    color: #5a6a7e;
+    margin-bottom: 3px;
+  }
+
+  /* Compare table */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .compare-table th {
+    padding: 12px 16px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 13px;
+    border-bottom: 2px solid #eef0f5;
+  }
+  .compare-table th:first-child { text-align: left; }
+  .compare-table td {
+    padding: 11px 16px;
+    text-align: center;
+    border-bottom: 1px solid #f0f2f7;
+    color: #4a5568;
+  }
+  .compare-table td:first-child {
+    text-align: left;
+    font-weight: 600;
+    color: #0f2850;
+  }
+  .compare-table .plan-a-col { background: #f9fafe; }
+  .compare-table .plan-b-col { background: #f0f7ff; }
+  .compare-table .plan-c-col { background: #f5f0ff; }
+  .compare-table th.plan-a-col { color: #2c6fad; }
+  .compare-table th.plan-b-col { color: #1a5fa0; }
+  .compare-table th.plan-c-col { color: #6b3fa0; }
+  .star { color: #f39c12; }
+  .check { color: #27ae60; font-weight: 700; }
+  .partial { color: #e67e22; }
+
+  /* Footer */
+  .footer {
+    background: #0f2850;
+    color: rgba(255,255,255,0.5);
+    padding: 28px 64px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer strong { color: rgba(255,255,255,0.8); }
+
+  /* Print */
+  @media print {
+    body { background: #fff; }
+    .page { box-shadow: none; max-width: 100%; }
+    .plan-card { break-inside: avoid; }
+    .section { break-inside: avoid; }
+  }
+
+  /* helpers */
+  .text-muted { color: #8a96a8; font-size: 12px; }
+  .mt-4 { margin-top: 16px; }
+  .mb-4 { margin-bottom: 16px; }
+  .note {
+    background: #f0f7ff;
+    border-left: 4px solid #3498db;
+    padding: 12px 18px;
+    border-radius: 0 8px 8px 0;
+    font-size: 13px;
+    color: #2c5282;
+    margin-top: 16px;
+  }
+  .warn {
+    background: #fff8e1;
+    border-left: 4px solid #f39c12;
+    padding: 12px 18px;
+    border-radius: 0 8px 8px 0;
+    font-size: 13px;
+    color: #5d4037;
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══════════════ COVER ═══════════════ -->
+<div class="cover">
+  <div class="cover-label">技术方案书 · 保密文件</div>
+  <h1>律所智能<span>档案管理</span>系统<br>本地化部署完整方案</h1>
+  <p class="cover-sub">全离线 · 零数据出境 · AI赋能 · 隐私合规</p>
+  <div class="cover-tags">
+    <span class="cover-tag">📁 档案自动归档分类</span>
+    <span class="cover-tag">⚖️ 全国法条智能匹配</span>
+    <span class="cover-tag">🤖 AI案件分析报告</span>
+    <span class="cover-tag">🔒 当事人隐私隔离</span>
+    <span class="cover-tag">🖥️ 私有化本地部署</span>
+    <span class="cover-tag">📲 在线建档入口</span>
+  </div>
+  <div class="cover-date">方案版本：2026年6月</div>
+</div>
+
+<!-- ═══════════════ 01 项目概述 ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <h2>项目背景与核心需求</h2>
+  </div>
+
+  <div class="intro-grid">
+    <div class="intro-card">
+      <h4>核心痛点</h4>
+      <p>纸质档案与电子文件分散管理，查阅耗时；相关法条与案例依赖人工检索，效率低下；历史档案归档标准不一，无法有效复用。</p>
+    </div>
+    <div class="intro-card">
+      <h4>系统目标</h4>
+      <p>实现全档案数字化入库与智能分类；自动关联全国现行法律法规；AI辅助生成案件分析报告；所有数据严格本地化，当事人信息不出所内网络。</p>
+    </div>
+    <div class="intro-card">
+      <h4>文档来源</h4>
+      <p>新案件：当事人通过浏览器在线填写结构化建档表单，提交即入库。<br>历史档案：扫描件（图片/PDF）批量上传，AI自动OCR识别与归类。</p>
+    </div>
+    <div class="intro-card">
+      <h4>部署原则</h4>
+      <p>100% 本地服务器运行，AI推理在内网完成，零云端调用，客户数据物理隔离。符合律师行业对委托人信息保密的职业要求与合规要求。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ 02 系统架构 ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <h2>系统整体架构</h2>
+  </div>
+
+  <div class="arch-box">
+    <div class="arch-title">[ 律所智能档案系统 · 本地网络架构图 ]</div>
+<span class="c1">┌────────────────────────────────────────────────────────────────┐</span>
+<span class="c1">│                    律所内部网络（物理隔离）                          │</span>
+<span class="c1">│                                                                 │</span>
+<span class="c1">│  ┌──────────────┐   ┌──────────────┐   ┌──────────────────┐   │</span>
+<span class="c1">│  │  ① 在线建档   │   │ ② 历史档案    │   │  ③ 法条知识库      │   │</span>
+<span class="c1">│  │  浏览器填表   │   │  扫描件上传   │   │  全国现行法律全文  │   │</span>
+<span class="c1">│  └──────┬───────┘   └──────┬────────┘   └────────┬─────────┘   │</span>
+<span class="c1">│         └──────────────────┴─────────────────────┘             │</span>
+<span class="c1">│                             ↓                                   │</span>
+<span class="c2">│                  ┌──────────────────────┐                       │</span>
+<span class="c2">│                  │     FastAPI 后端       │                       │</span>
+<span class="c2">│                  │  文档解析 · OCR识别    │                       │</span>
+<span class="c2">│                  │  档案分类 · 权限管理   │                       │</span>
+<span class="c2">│                  └──────────┬───────────┘                       │</span>
+<span class="c1">│          ┌───────────────── ┼ ─────────────────────┐            │</span>
+<span class="c1">│          ↓                  ↓                      ↓            │</span>
+<span class="c3">│ ┌─────────────────┐  ┌──────────────────┐  ┌────────────────┐  │</span>
+<span class="c3">│ │   ChromaDB      │  │  Ollama + Qwen3  │  │  PostgreSQL    │  │</span>
+<span class="c3">│ │  向量语义检索    │  │  本地大语言模型   │  │  档案结构化库  │  │</span>
+<span class="c3">│ │  · 相似案件检索  │  │  · 档案智能分析  │  │  · 当事人信息  │  │</span>
+<span class="c3">│ │  · 法条精准匹配  │  │  · 法条关联推荐  │  │  · 案件状态    │  │</span>
+<span class="c3">│ └─────────────────┘  └──────────────────┘  └────────────────┘  │</span>
+<span class="c1">│                             ↓                                   │</span>
+<span class="c4">│              ┌───────────────────────────────┐                  │</span>
+<span class="c4">│              │       Web 管理界面（内网）         │                  │</span>
+<span class="c4">│              │  律师端 / 合伙人端 / 客户查询端   │                  │</span>
+<span class="c4">│              └───────────────────────────────┘                  │</span>
+<span class="c1">└────────────────────────────────────────────────────────────────┘</span>
+     <span class="c5">↑ 内网访问（律师工位）    ↑ 客户端（隔离子网，仅建档/查询）</span></div>
+
+  <div class="modules-grid">
+    <div class="module-card" style="--accent: #3498db;">
+      <div class="module-icon">📝</div>
+      <h4>模块一：在线建档</h4>
+      <p>当事人通过浏览器填写结构化表单（民事/刑事/商事/行政四类），提交后自动生成案件档案、分配编号、生成委托书草稿。无需安装任何软件。</p>
+    </div>
+    <div class="module-card" style="--accent: #27ae60;">
+      <div class="module-icon">🔍</div>
+      <h4>模块二：历史档案入库</h4>
+      <p>批量上传扫描件（图片/PDF），PaddleOCR自动提取文字，AI识别文档类型（判决书/起诉状/证据材料等），关联案件自动归档。</p>
+    </div>
+    <div class="module-card" style="--accent: #e74c3c;">
+      <div class="module-icon">⚖️</div>
+      <h4>模块三：法条知识库</h4>
+      <p>预加载全国3000余部现行有效法律全文，向量化存储。输入案情描述，语义搜索精准匹配相关法条，支持条文级别定位。</p>
+    </div>
+    <div class="module-card" style="--accent: #9b59b6;">
+      <div class="module-icon">🤖</div>
+      <h4>模块四：AI案件分析</h4>
+      <p>本地大模型读取档案材料，自动提取案件要素、识别争议焦点、推荐适用法条、检索相似历史案件，输出结构化分析报告。</p>
+    </div>
+    <div class="module-card" style="--accent: #f39c12;">
+      <div class="module-icon">🗂️</div>
+      <h4>模块五：档案管理台</h4>
+      <p>全档案语义搜索、案件状态追踪、批注协作、分析报告管理。三级权限体系：实习生/律师/合伙人，数据访问精细管控。</p>
+    </div>
+    <div class="module-card" style="--accent: #1abc9c;">
+      <div class="module-icon">🔐</div>
+      <h4>模块六：隐私隔离</h4>
+      <p>客户端与律师端网络物理隔离；敏感字段数据库加密存储；AI推理全程在本地完成；文件存储于加密卷。零云端，零数据出境。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ 03 隐私安全 ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <h2>隐私合规与安全架构</h2>
+  </div>
+
+  <div class="privacy-grid">
+    <div class="privacy-card">
+      <div class="icon">🏠</div>
+      <h4>数据不出境</h4>
+      <p>所有AI推理、检索、分析均在所内服务器完成，无任何云端API调用，当事人信息物理上无法离开内网</p>
+    </div>
+    <div class="privacy-card">
+      <div class="icon">🔑</div>
+      <h4>加密存储</h4>
+      <p>档案文件存储于VeraCrypt加密卷；数据库中身份证号、联系方式等敏感字段列级加密</p>
+    </div>
+    <div class="privacy-card">
+      <div class="icon">🛡️</div>
+      <h4>访问隔离</h4>
+      <p>客户建档专用子网，提交后即关闭访问；律师系统通过内网IP白名单限制；三级角色权限精细管控</p>
+    </div>
+  </div>
+
+  <div class="privacy-note">
+    <strong>合规说明：</strong>本方案满足《律师事务所管理办法》对客户信息保密的要求，以及《个人信息保护法》关于最小化原则和存储安全的规定。AI分析模型完全本地部署，不依赖任何第三方AI服务，委托人信息无任何外泄风险。
+  </div>
+</div>
+
+<!-- ═══════════════ 04 硬件方案 ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <h2>服务器硬件配置方案</h2>
+  </div>
+
+  <p class="text-muted mb-4">以下三套方案均为完整可独立运行的配置，按律所规模选择其一即可。所有方案均包含AI推理所需GPU、数据库存储、UPS断电保护。</p>
+
+  <!-- 方案一 -->
+  <div class="plan-card">
+    <div class="plan-header" style="background: linear-gradient(135deg, #2c5f8a, #1a3d6b);">
+      <div class="plan-header-left">
+        <h3>方案 A · 基础档</h3>
+        <div class="tagline">适合 5–10 人律所 · 预算优先</div>
+      </div>
+      <div class="plan-price">
+        <div class="amount">¥1.4–1.6万</div>
+        <div class="unit">参考总价（含UPS）</div>
+        <div class="plan-badge">5-10 名律师</div>
+      </div>
+    </div>
+    <div class="plan-body">
+      <table class="hw-table">
+        <thead>
+          <tr>
+            <th>类别</th>
+            <th>型号 / 规格</th>
+            <th>关键参数</th>
+            <th>估价</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="col-cat">GPU</td>
+            <td class="col-model">NVIDIA RTX 3090 24GB<br><span class="text-muted">（正规渠道二手，附保修）</span></td>
+            <td class="col-spec">VRAM 24GB / 内存带宽 936GB/s<br>可跑 Qwen3.6-35B MoE 模型</td>
+            <td class="col-price">¥4,500–6,000</td>
+          </tr>
+          <tr>
+            <td class="col-cat">CPU</td>
+            <td class="col-model">AMD Ryzen 9 9950X</td>
+            <td class="col-spec">16核32线程 / Zen5架构<br>OCR文档处理多线程性能强</td>
+            <td class="col-price">¥3,400–3,800</td>
+          </tr>
+          <tr>
+            <td class="col-cat">主板</td>
+            <td class="col-model">华硕 ProArt X870E / AM5平台</td>
+            <td class="col-spec">PCIe 5.0 / DDR5 / 多M.2</td>
+            <td class="col-price">¥1,800</td>
+          </tr>
+          <tr>
+            <td class="col-cat">内存</td>
+            <td class="col-model">64GB DDR5-6000</td>
+            <td class="col-spec">2×32GB / 双通道<br>ChromaDB向量库使用</td>
+            <td class="col-price">¥1,200</td>
+          </tr>
+          <tr>
+            <td class="col-cat">系统盘</td>
+            <td class="col-model">1TB NVMe SSD（PCIe 4.0）</td>
+            <td class="col-spec">系统 + AI模型存储（约30GB）</td>
+            <td class="col-price">¥400</td>
+          </tr>
+          <tr>
+            <td class="col-cat">档案盘</td>
+            <td class="col-model">4TB HDD × 2</td>
+            <td class="col-spec">建议RAID 1镜像<br>有效容量4TB，数据双备份</td>
+            <td class="col-price">¥800</td>
+          </tr>
+          <tr>
+            <td class="col-cat">电源</td>
+            <td class="col-model">海韵/振华 850W 金牌全模组</td>
+            <td class="col-spec">GPU满载约550W，850W留有余量</td>
+            <td class="col-price">¥600</td>
+          </tr>
+          <tr>
+            <td class="col-cat">机箱散热</td>
+            <td class="col-model">中塔机箱 + 360mm一体水冷</td>
+            <td class="col-spec">保证GPU长期稳定运行</td>
+            <td class="col-price">¥800</td>
+          </tr>
+          <tr>
+            <td class="col-cat">UPS</td>
+            <td class="col-model">山特 TG-BOX 1000（1000VA）</td>
+            <td class="col-spec">在线互动式 / 纯正弦波<br>断电后维持约8-12分钟安全关机</td>
+            <td class="col-price">¥700</td>
+          </tr>
+          <tr class="total-row">
+            <td class="col-cat">合计</td>
+            <td colspan="2" class="col-model">含所有配件，不含安装服务费</td>
+            <td class="col-price">¥14,000–16,000</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="perf-strip">
+        <div class="perf-item"><span class="perf-dot"></span>AI推理速度：约 100–140 tok/s（Qwen3.6-35B MoE）</div>
+        <div class="perf-item"><span class="perf-dot"></span>扫描件OCR：每页约 0.5–1 秒</div>
+        <div class="perf-item"><span class="perf-dot yellow"></span>5–8人同时使用：良好；高峰期轻微排队</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案二 -->
+  <div class="plan-card">
+    <div class="plan-header" style="background: linear-gradient(135deg, #1a5fa0, #0f3d7a);">
+      <div class="plan-header-left">
+        <h3>方案 B · 推荐档 <span class="recommended-badge">推荐</span></h3>
+        <div class="tagline">适合 10–20 人律所 · 性能与预算最优平衡</div>
+      </div>
+      <div class="plan-price">
+        <div class="amount">¥3.0–3.3万</div>
+        <div class="unit">参考总价（含UPS）</div>
+        <div class="plan-badge">10-20 名律师</div>
+      </div>
+    </div>
+    <div class="plan-body">
+      <table class="hw-table">
+        <thead>
+          <tr>
+            <th>类别</th>
+            <th>型号 / 规格</th>
+            <th>关键参数</th>
+            <th>估价</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="col-cat">GPU</td>
+            <td class="col-model">NVIDIA RTX 5090D V2 24GB<br><span class="text-muted">（国行正品，Blackwell架构）</span></td>
+            <td class="col-spec">VRAM 24GB GDDR7 / 带宽 1568GB/s<br>大陆合规最强推理卡</td>
+            <td class="col-price">¥16,500–18,000</td>
+          </tr>
+          <tr>
+            <td class="col-cat">CPU</td>
+            <td class="col-model">AMD Ryzen 9 9950X</td>
+            <td class="col-spec">16核32线程 / Zen5 / 最高5.7GHz</td>
+            <td class="col-price">¥3,400–3,800</td>
+          </tr>
+          <tr>
+            <td class="col-cat">主板</td>
+            <td class="col-model">华硕 ProArt X870E 或 ROG 同级</td>
+            <td class="col-spec">PCIe 5.0 x16 / DDR5 / 双LAN</td>
+            <td class="col-price">¥2,000</td>
+          </tr>
+          <tr>
+            <td class="col-cat">内存</td>
+            <td class="col-model">128GB DDR5-6000</td>
+            <td class="col-spec">4×32GB / 四通道<br>支持大规模向量库并发查询</td>
+            <td class="col-price">¥2,400</td>
+          </tr>
+          <tr>
+            <td class="col-cat">系统盘</td>
+            <td class="col-model">2TB NVMe SSD（PCIe 5.0）</td>
+            <td class="col-spec">系统 + 模型 + 数据库热数据</td>
+            <td class="col-price">¥800</td>
+          </tr>
+          <tr>
+            <td class="col-cat">档案盘</td>
+            <td class="col-model">4TB HDD × 4</td>
+            <td class="col-spec">RAID 5配置，有效约12TB<br>单盘损坏不丢数据</td>
+            <td class="col-price">¥1,600</td>
+          </tr>
+          <tr>
+            <td class="col-cat">电源</td>
+            <td class="col-model">海韵 PRIME 1000W 钛金</td>
+            <td class="col-spec">5090D满载约575W，1000W充裕</td>
+            <td class="col-price">¥1,200</td>
+          </tr>
+          <tr>
+            <td class="col-cat">机箱散热</td>
+            <td class="col-model">全塔机箱 + 360mm一体水冷</td>
+            <td class="col-spec">5090D发热量大，散热须充足</td>
+            <td class="col-price">¥1,200</td>
+          </tr>
+          <tr>
+            <td class="col-cat">UPS</td>
+            <td class="col-model">山特 C2K 在线式（2000VA/1800W）</td>
+            <td class="col-spec">在线双变换 / 纯正弦波<br>断电维持约15分钟，支持安全备份</td>
+            <td class="col-price">¥1,800</td>
+          </tr>
+          <tr class="total-row">
+            <td class="col-cat">合计</td>
+            <td colspan="2" class="col-model">含所有配件，不含安装服务费</td>
+            <td class="col-price">¥30,000–33,000</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="perf-strip">
+        <div class="perf-item"><span class="perf-dot"></span>AI推理速度：约 103 tok/s（14B Dense）/ 更高（35B MoE）</div>
+        <div class="perf-item"><span class="perf-dot"></span>扫描件OCR：每页 &lt; 0.5 秒</div>
+        <div class="perf-item"><span class="perf-dot"></span>15–20人并发：优秀，响应时间5–10秒/次分析</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案三 -->
+  <div class="plan-card">
+    <div class="plan-header" style="background: linear-gradient(135deg, #4a2080, #2d1060);">
+      <div class="plan-header-left">
+        <h3>方案 C · 高性能档</h3>
+        <div class="tagline">适合 20–50 人律所 · 多部门协同 · 服务器级可靠性</div>
+      </div>
+      <div class="plan-price">
+        <div class="amount">¥5.2–6.0万</div>
+        <div class="unit">参考总价（含UPS）</div>
+        <div class="plan-badge">20-50 名律师</div>
+      </div>
+    </div>
+    <div class="plan-body">
+      <table class="hw-table">
+        <thead>
+          <tr>
+            <th>类别</th>
+            <th>型号 / 规格</th>
+            <th>关键参数</th>
+            <th>估价</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="col-cat">GPU × 2</td>
+            <td class="col-model">RTX 3090 24GB × 2<br><span class="text-muted">（推理卡 + OCR专用卡）</span></td>
+            <td class="col-spec">推理/OCR完全独立，互不竞争<br>或合并跑 Qwen3-32B 高质量模型</td>
+            <td class="col-price">¥9,000–12,000</td>
+          </tr>
+          <tr>
+            <td class="col-cat">CPU</td>
+            <td class="col-model">AMD EPYC 9354（服务器级）</td>
+            <td class="col-spec">32核64线程 / PCIe 5.0 128通道<br>支持ECC内存 / 企业级稳定性</td>
+            <td class="col-price">¥12,000–15,000</td>
+          </tr>
+          <tr>
+            <td class="col-cat">主板</td>
+            <td class="col-model">超微 H13SSL-NT / 华硕 Pro WS</td>
+            <td class="col-spec">EPYC单路服务器平台<br>双LAN / IPMI远程管理</td>
+            <td class="col-price">¥8,000</td>
+          </tr>
+          <tr>
+            <td class="col-cat">内存</td>
+            <td class="col-model">256GB DDR5 ECC RDIMM</td>
+            <td class="col-spec">8×32GB / 错误校正内存<br>保障长期运行数据完整性</td>
+            <td class="col-price">¥8,000</td>
+          </tr>
+          <tr>
+            <td class="col-cat">存储</td>
+            <td class="col-model">2TB NVMe RAID 1 + NAS 40TB</td>
+            <td class="col-spec">系统盘冗余 + 大容量档案NAS<br>支持未来数年档案增长</td>
+            <td class="col-price">¥6,000</td>
+          </tr>
+          <tr>
+            <td class="col-cat">电源</td>
+            <td class="col-model">冗余双路服务器电源 2000W</td>
+            <td class="col-spec">单路故障自动切换，不停机</td>
+            <td class="col-price">¥2,000</td>
+          </tr>
+          <tr>
+            <td class="col-cat">机箱</td>
+            <td class="col-model">2U机架式（浪潮/曙光同级）</td>
+            <td class="col-spec">可放置机柜，专业机房管理</td>
+            <td class="col-price">¥3,000</td>
+          </tr>
+          <tr>
+            <td class="col-cat">UPS</td>
+            <td class="col-model">科华/山特 3000VA 机架式在线</td>
+            <td class="col-spec">在线双变换 / 可扩展电池组<br>双机断电维持30分钟以上</td>
+            <td class="col-price">¥4,000</td>
+          </tr>
+          <tr class="total-row">
+            <td class="col-cat">合计</td>
+            <td colspan="2" class="col-model">含所有配件，不含机柜与安装服务费</td>
+            <td class="col-price">¥52,000–60,000</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="perf-strip">
+        <div class="perf-item"><span class="perf-dot"></span>推理专用卡：约 52 tok/s，不受OCR干扰</div>
+        <div class="perf-item"><span class="perf-dot"></span>双卡合并：可运行 Qwen3-32B 高质量模型</div>
+        <div class="perf-item"><span class="perf-dot"></span>50人并发稳定运行，ECC内存长期可靠</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="warn">
+    <strong>GPU采购说明：</strong>RTX 4090 受美国出口管制自2023年11月起禁止向中国大陆出口，请勿采购来源不明的"水货4090"。国行合规选择为：① RTX 5090D V2（2025年发布，¥16,499 起）；② RTX 3090 二手（购买时须索要发票或正规平台保修凭证）。
+  </div>
+</div>
+
+<!-- ═══════════════ 05 方案对比 ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <h2>三方案横向对比</h2>
+  </div>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>对比项目</th>
+        <th class="plan-a-col">方案 A（基础）</th>
+        <th class="plan-b-col">方案 B（推荐）</th>
+        <th class="plan-c-col">方案 C（旗舰）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>参考预算</td>
+        <td class="plan-a-col">¥1.4–1.6万</td>
+        <td class="plan-b-col">¥3.0–3.3万</td>
+        <td class="plan-c-col">¥5.2–6.0万</td>
+      </tr>
+      <tr>
+        <td>适合律师人数</td>
+        <td class="plan-a-col">5–10人</td>
+        <td class="plan-b-col">10–20人</td>
+        <td class="plan-c-col">20–50人</td>
+      </tr>
+      <tr>
+        <td>推荐AI模型</td>
+        <td class="plan-a-col">Qwen3.6-35B MoE</td>
+        <td class="plan-b-col">Qwen3.6-35B MoE</td>
+        <td class="plan-c-col">Qwen3-32B Dense</td>
+      </tr>
+      <tr>
+        <td>AI推理速度</td>
+        <td class="plan-a-col">~110 tok/s</td>
+        <td class="plan-b-col">~120 tok/s</td>
+        <td class="plan-c-col">~32 tok/s（质量更高）</td>
+      </tr>
+      <tr>
+        <td>GPU来源</td>
+        <td class="plan-a-col">二手（有风险）</td>
+        <td class="plan-b-col">国行新货</td>
+        <td class="plan-c-col">二手双卡</td>
+      </tr>
+      <tr>
+        <td>档案存储容量</td>
+        <td class="plan-a-col">4TB（RAID1）</td>
+        <td class="plan-b-col">12TB（RAID5）</td>
+        <td class="plan-c-col">40TB（NAS）</td>
+      </tr>
+      <tr>
+        <td>内存</td>
+        <td class="plan-a-col">64GB DDR5</td>
+        <td class="plan-b-col">128GB DDR5</td>
+        <td class="plan-c-col">256GB ECC</td>
+      </tr>
+      <tr>
+        <td>硬件可靠性</td>
+        <td class="plan-a-col"><span class="star">★★★</span>☆☆</td>
+        <td class="plan-b-col"><span class="star">★★★★</span>☆</td>
+        <td class="plan-c-col"><span class="star">★★★★★</span></td>
+      </tr>
+      <tr>
+        <td>冗余保护</td>
+        <td class="plan-a-col">RAID1 磁盘镜像</td>
+        <td class="plan-b-col">RAID5 + UPS</td>
+        <td class="plan-c-col">冗余电源 + RAID + NAS</td>
+      </tr>
+      <tr>
+        <td>运维难度</td>
+        <td class="plan-a-col"><span class="check">普通PC</span></td>
+        <td class="plan-b-col"><span class="check">普通PC</span></td>
+        <td class="plan-c-col"><span class="partial">服务器平台</span></td>
+      </tr>
+      <tr>
+        <td>是否推荐</td>
+        <td class="plan-a-col">预算受限首选</td>
+        <td class="plan-b-col" style="font-weight:700;color:#1a5fa0;">⭐ 首选推荐</td>
+        <td class="plan-c-col">大所/有IT支持</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note mt-4">
+    <strong>选型建议：</strong>对大多数10–20人规模的律所，方案B（RTX 5090D V2 + 128GB RAM）是性价比最优组合——国行正品无合规风险，AI推理速度够快，存储空间足够未来3–5年增长，且运维难度与普通高性能台式机相当。
+  </div>
+</div>
+
+<!-- ═══════════════ 06 软件技术栈 ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <h2>软件技术栈</h2>
+  </div>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-label">后端框架</div>
+      <div class="tech-name">Python + FastAPI</div>
+      <div class="tech-desc">高性能异步API，支持文档处理、OCR、AI调用的并发执行</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-label">AI 大模型</div>
+      <div class="tech-name">Ollama + Qwen3.6</div>
+      <div class="tech-desc">阿里巴巴开源中文大模型，本地推理，对中文法律文本理解优秀</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-label">OCR 识别</div>
+      <div class="tech-name">PP-StructureV3 + PaddleOCR-VL</div>
+      <div class="tech-desc">百度开源中文OCR，版式理解+表格+文字框提取；VL模型可选，满足高精度扫描件场景</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-label">语义 NER 提取</div>
+      <div class="tech-name">HaS Text 0.6B + 正则兜底</div>
+      <div class="tech-desc">轻量语义命名实体识别，从文档中自动抽取原告/被告/案号/法院/金额等20+法律字段；正则补全身份证号、手机号等高确信度字段</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-label">向量数据库</div>
+      <div class="tech-name">ChromaDB</div>
+      <div class="tech-desc">本地持久化向量库，实现法条与案件的语义相似度检索</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-label">结构化数据库</div>
+      <div class="tech-name">PostgreSQL</div>
+      <div class="tech-desc">存储档案元数据、当事人信息、案件状态、权限控制</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-label">向量嵌入模型</div>
+      <div class="tech-name">BGE-Large-ZH</div>
+      <div class="tech-desc">北京智源开源中文语义嵌入模型，本地运行，专为中文法律检索优化</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-label">PDF 解析</div>
+      <div class="tech-name">PyMuPDF</div>
+      <div class="tech-desc">高速PDF文本提取，保留原始格式，支持中文法律文书</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-label">视觉特征识别</div>
+      <div class="tech-name">LocateAnything-3B + OpenCV</div>
+      <div class="tech-desc">视觉定位模型识别印章、签字、证件、人脸等22类视觉隐私区域；OpenCV补全骑缝章与边缘章</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-label">数据隔离</div>
+      <div class="tech-name">Tenant-per-client 目录隔离</div>
+      <div class="tech-desc">每位当事人对应独立加密数据目录，参考 DataInfra 多租户隔离方案；文件、配置、导出互不交叉</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-label">管理界面</div>
+      <div class="tech-name">HTML + Bootstrap 5</div>
+      <div class="tech-desc">纯浏览器访问，无需安装任何客户端软件，所内任意电脑可用</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-label">法条数据源</div>
+      <div class="tech-name">国家法律法规数据库</div>
+      <div class="tech-desc">3000余部现行有效法律，本地向量化部署，离线完整可用</div>
+    </div>
+  </div>
+
+  <div class="note mt-4">
+    以上所有软件均为开源或免费工具，<strong>无年费、无license费用</strong>。一次性搭建，长期运行成本仅为服务器电费（满载约600W，月电费约 ¥200–300）。
+  </div>
+</div>
+
+<!-- ═══════════════ 07 实施计划 ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <h2>实施计划（预计6–7周）</h2>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot">1</div>
+      <h4>第一阶段：基础建设 <span class="duration">第1–2周</span></h4>
+      <ul>
+        <li>服务器组装、系统安装、网络隔离配置（VLAN划分）</li>
+        <li>PostgreSQL数据库建模（案件/当事人/档案/权限）</li>
+        <li>FastAPI后端基础框架搭建</li>
+        <li>客户在线建档表单（民事/刑事/商事/行政四类）</li>
+        <li>基础档案管理界面（上传/查看/搜索）</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">2</div>
+      <h4>第二阶段：档案入库 <span class="duration">第2–3周</span></h4>
+      <ul>
+        <li>PP-StructureV3 集成，批量扫描件处理流水线（OCR + 版式理解）</li>
+        <li>HaS Text 0.6B 语义NER：自动提取原告/被告/案号/法院/金额等法律实体字段</li>
+        <li>AI文档类型自动识别（判决书/起诉状/证据等），LocateAnything检测印章、签字</li>
+        <li>历史档案批量导入工具（支持拖拽上传）</li>
+        <li>档案加密存储配置（VeraCrypt加密卷 + per-client目录隔离）</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">3</div>
+      <h4>第三阶段：法条知识库 <span class="duration">第3–4周</span></h4>
+      <ul>
+        <li>下载国家法律法规数据库全文（3000+部）</li>
+        <li>文本清洗、按条文分段切片</li>
+        <li>BGE-Large-ZH向量化，入库ChromaDB</li>
+        <li>法条语义搜索接口与界面</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">4</div>
+      <h4>第四阶段：AI分析引擎 <span class="duration">第4–5周</span></h4>
+      <ul>
+        <li>Ollama + Qwen3.6模型部署与调优</li>
+        <li>RAG流水线：档案 → 向量检索 → 大模型分析</li>
+        <li>分析报告模板（要素提取/争议焦点/法条推荐/相似案件）</li>
+        <li>分析结果持久化与导出（PDF/Word）</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">5</div>
+      <h4>第五阶段：测试与交付 <span class="duration">第5–7周</span></h4>
+      <ul>
+        <li>全流程测试（建档→入库→检索→分析）</li>
+        <li>权限体系验证（实习生/律师/合伙人三级）</li>
+        <li>历史档案批量导入（律所提供扫描件）</li>
+        <li>使用培训（1–2次，3小时/次）</li>
+        <li>上线后2周内跟进支持</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ 08 后续扩展 ═══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <h2>后续扩展能力</h2>
+  </div>
+
+  <div class="intro-grid">
+    <div class="intro-card">
+      <h4>对接裁判文书网</h4>
+      <p>可扩展接入中国裁判文书网历史判决数据，将百万量级真实案例纳入相似案件检索库，显著提升案例参考质量。</p>
+    </div>
+    <div class="intro-card">
+      <h4>合同智能审查</h4>
+      <p>对上传的合同文本自动审查条款风险、识别异常条款、对比行业标准合同，生成合同风险报告。</p>
+    </div>
+    <div class="intro-card">
+      <h4>案件进度推送</h4>
+      <p>当事人可通过专属链接查看案件进度，律师设置节点提醒，系统自动推送通知（短信/邮件）。</p>
+    </div>
+    <div class="intro-card">
+      <h4>多模型升级</h4>
+      <p>系统架构预留更强模型接入能力。随硬件升级或新一代中文法律模型发布，可无缝切换更高质量的AI模型。</p>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <div>
+    <strong>律所智能档案管理系统</strong> · 本地化部署完整方案<br>
+    本文档内容基于2026年6月市场数据，价格仅供参考，实际采购以当时市场为准
+  </div>
+  <div style="text-align:right;">
+    方案版本 v1.0<br>
+    2026年6月
+  </div>
+</div>
+
+</div>
+</body>
+</html>
