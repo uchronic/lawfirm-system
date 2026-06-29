@@ -3,1329 +3,1625 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>律智档案 · 律所智能管理系统</title>
+<title>案件委托登记 — 智法档案系统</title>
 <style>
-:root {
-  --navy: #0f2850;
-  --navy-mid: #1a3d6b;
-  --blue: #1d6fa4;
-  --blue-light: #e8f1fb;
-  --green: #1a8a5a;
-  --green-light: #e6f7ee;
-  --orange: #e07b20;
-  --orange-light: #fff4e8;
-  --red: #c0392b;
-  --red-light: #fdecea;
-  --yellow: #c8960c;
-  --yellow-light: #fff8e1;
-  --gray-50: #f8f9fc;
-  --gray-100: #f0f2f7;
-  --gray-200: #e2e8f0;
-  --gray-400: #94a3b8;
-  --gray-600: #5a6a7e;
-  --gray-800: #2d3748;
-  --sidebar-w: 224px;
-  --topbar-h: 56px;
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f2850;--blue:#1d6fa4;--sky:#e8f4fd;
+  --green:#16a34a;--red:#dc2626;--amber:#d97706;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-400:#9ca3af;--gray-600:#4b5563;--gray-800:#1f2937;
+  --radius:8px;--shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Microsoft YaHei',sans-serif; font-size:13px; color:var(--gray-800); background:var(--gray-50); display:flex; height:100vh; overflow:hidden; }
+body{font-family:'Microsoft YaHei',system-ui,sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh}
 
-/* ── Sidebar ── */
-.sidebar {
-  width: var(--sidebar-w);
-  background: var(--navy);
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-.sidebar-logo {
-  height: var(--topbar-h);
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  gap: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.logo-icon {
-  width: 30px; height: 30px;
-  background: linear-gradient(135deg, #3b82f6, #1d6fa4);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; color: #fff;
-}
-.logo-text { color: #fff; font-size: 15px; font-weight: 700; }
-.logo-text span { color: #7eb8f7; }
+/* Header */
+.site-header{background:var(--navy);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:34px;height:34px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2}
+.logo-text{color:#fff;font-size:16px;font-weight:600;letter-spacing:.5px}
+.header-badge{background:rgba(255,255,255,.15);color:#fff;font-size:12px;padding:4px 10px;border-radius:20px}
 
-.sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
-.nav-section { margin-bottom: 4px; }
-.nav-label {
-  font-size: 10px;
-  color: rgba(255,255,255,0.3);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 10px 20px 4px;
-  font-weight: 600;
-}
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 20px;
-  cursor: pointer;
-  color: rgba(255,255,255,0.6);
-  font-size: 13px;
-  transition: all .15s;
-  position: relative;
-  border-radius: 0;
-}
-.nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9); }
-.nav-item.active {
-  background: rgba(61,130,246,0.18);
-  color: #fff;
-}
-.nav-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 4px; bottom: 4px;
-  width: 3px;
-  background: #3b82f6;
-  border-radius: 0 2px 2px 0;
-}
-.nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
-.nav-badge {
-  margin-left: auto;
-  background: #c0392b;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 1px 6px;
-  border-radius: 10px;
-  min-width: 18px;
-  text-align: center;
-}
-.nav-badge.blue { background: var(--blue); }
-.nav-badge.green { background: var(--green); }
+/* Progress bar */
+.progress-wrap{background:#fff;border-bottom:1px solid var(--gray-200);padding:16px 0}
+.progress-inner{max-width:780px;margin:0 auto;padding:0 24px}
+.steps{display:flex;align-items:center;gap:0}
+.step{display:flex;align-items:center;flex:1}
+.step:last-child{flex:0}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--gray-200);background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gray-400);flex-shrink:0;transition:.2s}
+.step-label{font-size:12px;color:var(--gray-400);margin-left:8px;white-space:nowrap;transition:.2s}
+.step-line{flex:1;height:2px;background:var(--gray-200);margin:0 8px;transition:.2s}
+.step.done .step-dot{background:var(--green);border-color:var(--green);color:#fff}
+.step.done .step-label{color:var(--green)}
+.step.done .step-line{background:var(--green)}
+.step.active .step-dot{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 0 4px rgba(29,111,164,.15)}
+.step.active .step-label{color:var(--blue);font-weight:600}
 
-.sidebar-user {
-  padding: 14px 20px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  display: flex; align-items: center; gap: 10px;
-}
-.user-avatar {
-  width: 32px; height: 32px;
-  background: linear-gradient(135deg, #3b82f6, #1d6fa4);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 13px; font-weight: 700; flex-shrink: 0;
-}
-.user-info { flex: 1; overflow: hidden; }
-.user-name { color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.user-role { color: rgba(255,255,255,0.4); font-size: 11px; }
+/* Main layout */
+.main{max-width:780px;margin:32px auto 80px;padding:0 24px}
 
-/* ── Main ── */
-.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+/* Card */
+.card{background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+.card-header{padding:20px 24px 16px;border-bottom:1px solid var(--gray-100)}
+.card-title{font-size:17px;font-weight:600;color:var(--gray-800);display:flex;align-items:center;gap:8px}
+.card-title .icon{width:22px;height:22px;background:var(--sky);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.card-title .icon svg{width:14px;height:14px;stroke:var(--blue);fill:none;stroke-width:2}
+.card-subtitle{font-size:13px;color:var(--gray-400);margin-top:4px}
+.card-body{padding:20px 24px}
 
-.topbar {
-  height: var(--topbar-h);
-  background: #fff;
-  border-bottom: 1px solid var(--gray-200);
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-  gap: 12px;
-  flex-shrink: 0;
-}
-.topbar-title { font-size: 15px; font-weight: 700; color: var(--navy); flex: 1; }
-.topbar-search {
-  display: flex; align-items: center;
-  background: var(--gray-50);
-  border: 1px solid var(--gray-200);
-  border-radius: 8px;
-  padding: 0 12px;
-  gap: 8px; width: 240px;
-}
-.topbar-search input {
-  border: none; background: none; outline: none;
-  font-size: 13px; color: var(--gray-800);
-  width: 100%; padding: 7px 0;
-}
-.topbar-search span { color: var(--gray-400); font-size: 14px; }
-.topbar-btn {
-  width: 34px; height: 34px;
-  border-radius: 8px;
-  border: 1px solid var(--gray-200);
-  background: #fff;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; color: var(--gray-600);
-  transition: all .15s;
-}
-.topbar-btn:hover { background: var(--gray-50); border-color: var(--gray-400); }
-.notif-dot { position: relative; }
-.notif-dot::after {
-  content: '';
-  position: absolute;
-  top: 6px; right: 6px;
-  width: 7px; height: 7px;
-  background: #c0392b;
-  border-radius: 50%;
-  border: 1.5px solid #fff;
-}
-.new-case-btn {
-  background: var(--navy);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 0 16px;
-  height: 34px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  display: flex; align-items: center; gap: 6px;
-  transition: background .15s;
-}
-.new-case-btn:hover { background: var(--navy-mid); }
+/* Step pages */
+.step-page{display:none}
+.step-page.active{display:block}
 
-.content { flex: 1; overflow-y: auto; padding: 24px; }
+/* Case type selector */
+.type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.type-card{border:2px solid var(--gray-200);border-radius:var(--radius);padding:18px 12px;text-align:center;cursor:pointer;transition:.15s;background:#fff;position:relative}
+.type-card:hover{border-color:var(--blue);background:var(--sky)}
+.type-card.selected{border-color:var(--blue);background:var(--sky)}
+.type-card.selected::after{content:'✓';position:absolute;top:6px;right:8px;font-size:12px;color:var(--blue);font-weight:700}
+.type-icon{font-size:26px;margin-bottom:8px}
+.type-name{font-size:14px;font-weight:600;color:var(--gray-800)}
+.type-desc{font-size:11px;color:var(--gray-400);margin-top:4px;line-height:1.4}
 
-/* ── Pages (views) ── */
-.page-view { display: none; }
-.page-view.active { display: block; }
+/* Form elements */
+.form-row{display:grid;gap:16px;margin-bottom:16px}
+.form-row.cols-2{grid-template-columns:1fr 1fr}
+.form-row.cols-3{grid-template-columns:1fr 1fr 1fr}
+.form-row.cols-1{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:13px;font-weight:500;color:var(--gray-600)}
+.required::after{content:' *';color:var(--red);font-weight:400}
+.form-control{padding:9px 12px;border:1px solid var(--gray-200);border-radius:6px;font-size:14px;font-family:inherit;color:var(--gray-800);transition:.15s;outline:none;background:#fff;width:100%}
+.form-control:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(29,111,164,.1)}
+.form-control::placeholder{color:var(--gray-400)}
+textarea.form-control{resize:vertical;min-height:90px}
+select.form-control{cursor:pointer}
+.form-hint{font-size:12px;color:var(--gray-400)}
 
-/* ── Dashboard ── */
-.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
-.stat-card {
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid var(--gray-200);
-  padding: 20px 22px;
-  display: flex; flex-direction: column; gap: 8px;
-}
-.stat-card .label { font-size: 12px; color: var(--gray-600); }
-.stat-card .value { font-size: 28px; font-weight: 700; color: var(--navy); line-height: 1; }
-.stat-card .change { font-size: 11px; display: flex; align-items: center; gap: 4px; }
-.change.up { color: var(--green); }
-.change.down { color: var(--red); }
-.stat-accent { border-top: 3px solid var(--blue); }
+/* Section divider */
+.section-divider{display:flex;align-items:center;gap:10px;margin:20px 0 16px;font-size:13px;font-weight:600;color:var(--gray-600)}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+.section-divider::before{flex:0;width:0;display:none}
+.divider-line{flex:1;height:1px;background:var(--gray-200)}
 
-.dash-grid { display: grid; grid-template-columns: 1fr 380px; gap: 16px; }
-.card {
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid var(--gray-200);
-  overflow: hidden;
-}
-.card-header {
-  padding: 16px 20px 12px;
-  display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--gray-100);
-}
-.card-header h3 { font-size: 14px; font-weight: 700; color: var(--navy); }
-.card-header a { font-size: 12px; color: var(--blue); cursor: pointer; text-decoration: none; }
+/* Upload area */
+.upload-area{border:2px dashed var(--gray-200);border-radius:var(--radius);padding:28px;text-align:center;cursor:pointer;transition:.15s;background:var(--gray-50)}
+.upload-area:hover{border-color:var(--blue);background:var(--sky)}
+.upload-icon{font-size:32px;margin-bottom:8px}
+.upload-title{font-size:14px;font-weight:500;color:var(--gray-800);margin-bottom:4px}
+.upload-hint{font-size:12px;color:var(--gray-400)}
+.upload-input{display:none}
+.file-list{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.file-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#fff;border:1px solid var(--gray-200);border-radius:6px;font-size:13px}
+.file-item-icon{color:var(--blue);flex-shrink:0}
+.file-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-item-size{color:var(--gray-400);font-size:12px;flex-shrink:0}
+.file-item-del{cursor:pointer;color:var(--gray-400);padding:2px 4px;border-radius:3px;transition:.1s;border:none;background:none;font-size:16px;line-height:1}
+.file-item-del:hover{color:var(--red);background:rgba(220,38,38,.08)}
 
-/* Case list table */
-.case-table { width: 100%; border-collapse: collapse; }
-.case-table th {
-  padding: 9px 16px;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--gray-400);
-  text-transform: uppercase;
-  letter-spacing: .6px;
-  background: var(--gray-50);
-  border-bottom: 1px solid var(--gray-100);
-}
-.case-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--gray-100);
-  vertical-align: middle;
-}
-.case-table tr:last-child td { border-bottom: none; }
-.case-table tr:hover td { background: var(--gray-50); cursor: pointer; }
+/* Conditional panels */
+.conditional-panel{display:none}
+.conditional-panel.show{display:block}
 
-.case-id { font-family: monospace; font-size: 11px; color: var(--gray-400); }
-.case-name { font-weight: 600; color: var(--gray-800); font-size: 13px; }
-.case-sub { font-size: 11px; color: var(--gray-600); margin-top: 2px; }
+/* Notice box */
+.notice{border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;font-size:13px;line-height:1.6}
+.notice-blue{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+.notice-amber{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.notice-green{background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d}
+.notice strong{font-weight:600}
+.notice ul{padding-left:16px;margin-top:6px}
+.notice li{margin-bottom:2px}
 
-.badge-type {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.t-civil { background: #e8f1fb; color: #1d6fa4; }
-.t-criminal { background: #fdecea; color: #c0392b; }
-.t-commercial { background: #fff4e8; color: #e07b20; }
-.t-admin { background: #f3e8ff; color: #7c3aed; }
-.t-labor { background: #e6f7ee; color: #1a8a5a; }
-.t-ip { background: #fff8e1; color: #c8960c; }
+/* Summary card */
+.summary-section{margin-bottom:20px}
+.summary-title{font-size:13px;font-weight:600;color:var(--navy);padding:8px 0;border-bottom:1px solid var(--gray-200);margin-bottom:12px}
+.summary-row{display:flex;font-size:13px;padding:5px 0;gap:12px}
+.summary-label{color:var(--gray-400);width:110px;flex-shrink:0}
+.summary-value{color:var(--gray-800);flex:1}
+.summary-tag{display:inline-block;background:var(--sky);color:var(--blue);font-size:12px;padding:2px 8px;border-radius:20px;font-weight:500}
 
-.badge-status {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-}
-.s-active { background: var(--green-light); color: var(--green); }
-.s-pending { background: var(--yellow-light); color: var(--yellow); }
-.s-closed { background: var(--gray-100); color: var(--gray-600); }
-.s-urgent { background: var(--red-light); color: var(--red); }
-.s-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+/* Nav buttons */
+.nav-bar{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:20px;border-top:1px solid var(--gray-200)}
+.btn{padding:10px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#1660910}
+.btn-primary:hover{filter:brightness(1.05)}
+.btn-secondary{background:#fff;color:var(--gray-600);border:1px solid var(--gray-200)}
+.btn-secondary:hover{background:var(--gray-50);border-color:var(--gray-400)}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{filter:brightness(1.05)}
+.btn-lg{padding:12px 32px;font-size:15px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 
-.lawyer-avatar {
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; color: #fff;
+/* Checkbox group */
+.checkbox-group{display:flex;flex-wrap:wrap;gap:8px}
+.checkbox-item{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:5px 10px;border:1px solid var(--gray-200);border-radius:5px;transition:.15s}
+.checkbox-item:hover{border-color:var(--blue);background:var(--sky)}
+.checkbox-item input{accent-color:var(--blue);cursor:pointer}
+.checkbox-item.checked{border-color:var(--blue);background:var(--sky);color:var(--blue);font-weight:500}
+
+/* Success page */
+.success-hero{text-align:center;padding:48px 24px}
+.success-circle{width:80px;height:80px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:36px}
+.success-title{font-size:22px;font-weight:700;color:var(--gray-800);margin-bottom:8px}
+.success-sub{font-size:14px;color:var(--gray-400);line-height:1.6;margin-bottom:28px}
+.case-number-box{display:inline-block;background:var(--sky);border:1px solid #bfdbfe;border-radius:8px;padding:12px 24px;font-size:18px;font-weight:700;color:var(--blue);letter-spacing:1px;margin-bottom:28px}
+
+/* Validation */
+.form-control.invalid{border-color:var(--red);background:#fff5f5}
+.error-msg{font-size:12px;color:var(--red);margin-top:3px;display:none}
+.form-group.has-error .error-msg{display:block}
+.form-group.has-error .form-control{border-color:var(--red)}
+
+/* Radio group */
+.radio-group{display:flex;flex-wrap:wrap;gap:8px}
+.radio-item{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:6px 12px;border:1px solid var(--gray-200);border-radius:5px;transition:.15s}
+.radio-item:hover{border-color:var(--blue);background:var(--sky)}
+.radio-item input{accent-color:var(--blue);cursor:pointer}
+.radio-item.selected{border-color:var(--blue);background:var(--sky);color:var(--blue);font-weight:500}
+
+@media(max-width:600px){
+  .type-grid{grid-template-columns:repeat(2,1fr)}
+  .form-row.cols-2,.form-row.cols-3{grid-template-columns:1fr}
+  .steps{gap:0}.step-label{display:none}
 }
 
-/* Deadline list */
-.deadline-list { padding: 0; }
-.deadline-item {
-  padding: 12px 20px;
-  border-bottom: 1px solid var(--gray-100);
-  display: flex; align-items: center; gap: 12px;
-}
-.deadline-item:last-child { border-bottom: none; }
-.dl-date {
-  width: 44px; text-align: center; flex-shrink: 0;
-}
-.dl-date .day { font-size: 20px; font-weight: 700; line-height: 1; }
-.dl-date .mon { font-size: 10px; color: var(--gray-400); }
-.dl-date.urgent .day { color: var(--red); }
-.dl-date.warn .day { color: var(--orange); }
-.dl-date.ok .day { color: var(--blue); }
-.dl-info { flex: 1; }
-.dl-name { font-size: 13px; font-weight: 600; color: var(--gray-800); }
-.dl-case { font-size: 11px; color: var(--gray-600); margin-top: 2px; }
-.dl-tag {
-  font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 600;
-}
+/* ── Tab navigation ───────────────────────────────────────── */
+.tab-nav{background:#fff;border-bottom:2px solid var(--gray-200);display:flex;padding:0 24px;position:sticky;top:60px;z-index:99}
+.tab-btn{padding:14px 20px;font-size:14px;font-weight:500;color:var(--gray-400);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;display:flex;align-items:center;gap:7px;transition:.15s;font-family:inherit}
+.tab-btn:hover{color:var(--blue)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.tab-panel{display:none}.tab-panel.active{display:block}
 
-/* Activity feed */
-.activity-list { padding: 0; }
-.activity-item {
-  padding: 10px 20px;
-  display: flex; align-items: flex-start; gap: 10px;
-  border-bottom: 1px solid var(--gray-100);
-}
-.activity-item:last-child { border-bottom: none; }
-.act-icon {
-  width: 28px; height: 28px;
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; flex-shrink: 0; margin-top: 1px;
-}
-.act-body { flex: 1; }
-.act-text { font-size: 12.5px; color: var(--gray-800); line-height: 1.5; }
-.act-text strong { color: var(--navy); }
-.act-time { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+/* ── API settings bar ─────────────────────────────────────── */
+.api-bar{background:#fffbeb;border-bottom:1px solid #fde68a;padding:8px 24px;display:flex;align-items:center;gap:12px;font-size:13px;color:#92400e}
+.api-bar input{padding:5px 10px;border:1px solid #fde68a;border-radius:5px;font-size:13px;width:300px;background:#fff}
+.api-bar button{padding:5px 14px;background:var(--blue);color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:13px}
+.api-bar.configured{background:#f0fdf4;border-bottom-color:#bbf7d0;color:#14532d}
+.api-bar-hide{display:none!important}
 
-/* ── Case List Page ── */
-.page-toolbar {
-  display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
-}
-.filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
-.filter-btn {
-  padding: 5px 14px;
-  border-radius: 20px;
-  border: 1px solid var(--gray-200);
-  background: #fff;
-  font-size: 12px;
-  color: var(--gray-600);
-  cursor: pointer;
-  transition: all .15s;
-}
-.filter-btn:hover { border-color: var(--blue); color: var(--blue); }
-.filter-btn.active { background: var(--navy); border-color: var(--navy); color: #fff; }
-.search-bar {
-  margin-left: auto;
-  display: flex; align-items: center;
-  background: #fff;
-  border: 1px solid var(--gray-200);
-  border-radius: 8px;
-  padding: 0 12px;
-  gap: 8px; width: 220px;
-}
-.search-bar input { border: none; background: none; outline: none; font-size: 13px; width: 100%; padding: 7px 0; }
+/* ── Case dashboard ───────────────────────────────────────── */
+.dash-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.dash-toolbar h2{font-size:18px;font-weight:700;color:var(--navy);flex:1}
+.filter-btn{padding:6px 14px;border:1px solid var(--gray-200);border-radius:20px;font-size:13px;background:#fff;cursor:pointer;color:var(--gray-600);transition:.15s}
+.filter-btn:hover,.filter-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.case-table{width:100%;border-collapse:collapse}
+.case-table th{font-size:12px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;padding:10px 12px;text-align:left;border-bottom:2px solid var(--gray-200);background:var(--gray-50)}
+.case-table td{padding:12px 12px;font-size:13px;border-bottom:1px solid var(--gray-100);vertical-align:middle}
+.case-table tr:hover td{background:#f8fbff;cursor:pointer}
+.status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
+.status-new{background:#eff6ff;color:#1d4ed8}
+.status-follow{background:#fff7ed;color:#c2410c}
+.status-filed{background:#fefce8;color:#a16207}
+.status-closed{background:#f0fdf4;color:#15803d}
+.risk-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.risk-high{background:#ef4444}.risk-med{background:#f59e0b}.risk-low{background:#22c55e}
+.empty-dash{text-align:center;padding:60px 20px;color:var(--gray-400)}
+.empty-dash-icon{font-size:48px;margin-bottom:12px}
 
-/* ── Case Detail Modal ── */
-.modal-overlay {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.45);
-  z-index: 100;
-  align-items: flex-start;
-  justify-content: flex-end;
-}
-.modal-overlay.open { display: flex; }
-.case-drawer {
-  width: 680px;
-  height: 100vh;
-  background: #fff;
-  overflow-y: auto;
-  box-shadow: -8px 0 40px rgba(0,0,0,0.15);
-  animation: slideIn .25s ease;
-}
-@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-.drawer-header {
-  background: var(--navy);
-  padding: 20px 24px;
-  color: #fff;
-  display: flex; align-items: flex-start; justify-content: space-between;
-}
-.drawer-header h2 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
-.drawer-header .meta { font-size: 12px; color: rgba(255,255,255,0.6); display: flex; gap: 16px; }
-.drawer-close {
-  background: rgba(255,255,255,0.1);
-  border: none; border-radius: 6px;
-  color: #fff; cursor: pointer;
-  width: 28px; height: 28px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-}
-.drawer-tabs {
-  display: flex;
-  border-bottom: 2px solid var(--gray-100);
-  background: var(--gray-50);
-}
-.drawer-tab {
-  padding: 11px 18px;
-  font-size: 13px; cursor: pointer;
-  color: var(--gray-600);
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  transition: all .15s;
-}
-.drawer-tab.active { color: var(--navy); border-bottom-color: var(--navy); font-weight: 700; background: #fff; }
-.drawer-body { padding: 20px 24px; }
+/* ── Case detail panel ────────────────────────────────────── */
+.detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:flex-start;justify-content:flex-end}
+.detail-overlay.open{display:flex}
+.detail-drawer{background:#fff;width:min(680px,100vw);height:100vh;overflow-y:auto;box-shadow:-4px 0 24px rgba(0,0,0,.15);display:flex;flex-direction:column}
+.drawer-header{padding:20px 24px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:#fff;z-index:1}
+.drawer-header h3{font-size:17px;font-weight:700;flex:1;color:var(--navy)}
+.drawer-close{cursor:pointer;font-size:22px;color:var(--gray-400);border:none;background:none;line-height:1;padding:4px}
+.drawer-close:hover{color:var(--gray-800)}
+.drawer-body{padding:20px 24px;flex:1}
+.drawer-section{margin-bottom:24px}
+.drawer-section-title{font-size:12px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--sky)}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px}
+.info-row{font-size:13px;display:flex;flex-direction:column;gap:2px}
+.info-label{color:var(--gray-400);font-size:11px}
+.info-val{color:var(--gray-800);font-weight:500}
+.status-select{padding:5px 10px;border:1px solid var(--gray-200);border-radius:5px;font-size:13px;cursor:pointer}
 
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-.detail-field label { font-size: 11px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .5px; display: block; margin-bottom: 4px; }
-.detail-field p { font-size: 13px; color: var(--gray-800); }
-
-.section-title { font-size: 13px; font-weight: 700; color: var(--navy); margin: 20px 0 10px; display: flex; align-items: center; gap: 8px; }
-.section-title::after { content: ''; flex: 1; height: 1px; background: var(--gray-100); }
-
-.doc-list { display: flex; flex-direction: column; gap: 8px; }
-.doc-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 14px;
-  background: var(--gray-50);
-  border-radius: 8px;
-  border: 1px solid var(--gray-100);
-}
-.doc-icon { font-size: 18px; }
-.doc-name { flex: 1; font-size: 13px; color: var(--gray-800); font-weight: 600; }
-.doc-meta { font-size: 11px; color: var(--gray-400); }
-.doc-action { font-size: 12px; color: var(--blue); cursor: pointer; }
-
-.timeline-list { position: relative; padding-left: 24px; }
-.timeline-list::before { content: ''; position: absolute; left: 8px; top: 8px; bottom: 0; width: 1px; background: var(--gray-200); }
-.tl-item { position: relative; margin-bottom: 16px; }
-.tl-dot { position: absolute; left: -20px; top: 3px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--blue); background: #fff; }
-.tl-dot.done { background: var(--blue); }
-.tl-dot.urgent { border-color: var(--red); background: var(--red); }
-.tl-date { font-size: 11px; color: var(--gray-400); margin-bottom: 2px; }
-.tl-text { font-size: 13px; color: var(--gray-800); }
-
-.ai-analysis {
-  background: linear-gradient(135deg, #f0f7ff, #e8f1fb);
-  border: 1px solid #c8ddf5;
-  border-radius: 10px;
-  padding: 16px 18px;
-}
-.ai-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-.ai-header h4 { font-size: 13px; font-weight: 700; color: var(--navy); }
-.ai-chip { background: var(--navy); color: #7eb8f7; font-size: 10px; padding: 2px 8px; border-radius: 4px; }
-.ai-section { margin-bottom: 12px; }
-.ai-section h5 { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
-.ai-section p { font-size: 12.5px; color: var(--gray-800); line-height: 1.7; }
-.law-tag {
-  display: inline-block;
-  background: #fff;
-  border: 1px solid #c8ddf5;
-  color: var(--navy);
-  padding: 2px 10px;
-  border-radius: 4px;
-  font-size: 11px;
-  margin: 2px 3px 2px 0;
-  cursor: pointer;
-}
-.law-tag:hover { background: var(--navy); color: #fff; }
-.risk-bar { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-.risk-label { font-size: 12px; color: var(--gray-600); width: 60px; }
-.risk-track { flex: 1; height: 6px; background: var(--gray-100); border-radius: 3px; overflow: hidden; }
-.risk-fill { height: 100%; border-radius: 3px; }
-
-/* ── Analytics ── */
-.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-.chart-card { background: #fff; border-radius: 12px; border: 1px solid var(--gray-200); padding: 20px; }
-.chart-card h3 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 16px; }
-.bar-chart { display: flex; flex-direction: column; gap: 10px; }
-.bar-row { display: flex; align-items: center; gap: 10px; }
-.bar-name { font-size: 12px; color: var(--gray-600); width: 60px; text-align: right; flex-shrink: 0; }
-.bar-track { flex: 1; height: 20px; background: var(--gray-100); border-radius: 4px; overflow: hidden; position: relative; }
-.bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
-.bar-fill span { font-size: 11px; font-weight: 700; color: #fff; }
-.donut-row { display: flex; gap: 20px; align-items: center; }
-.donut-legend { flex: 1; }
-.legend-item2 { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; }
-.legend-dot2 { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 3px; }
-
-/* ── Responsive notice ── */
-.empty-state { text-align: center; padding: 60px 20px; color: var(--gray-400); }
-.empty-state .icon { font-size: 40px; margin-bottom: 12px; }
-.empty-state p { font-size: 13px; }
+/* ── AI Analysis panel ────────────────────────────────────── */
+.ai-panel{background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+.ai-panel-header{padding:14px 20px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;display:flex;align-items:center;gap:10px}
+.ai-panel-header h4{font-size:15px;font-weight:600;flex:1}
+.ai-tabs{display:flex;border-bottom:1px solid var(--gray-200);background:#fafafa}
+.ai-tab{padding:10px 18px;font-size:13px;font-weight:500;color:var(--gray-400);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;transition:.1s}
+.ai-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.ai-content{padding:18px 20px;min-height:180px}
+.ai-section{display:none}.ai-section.active{display:block}
+.ai-loading{display:flex;align-items:center;gap:10px;color:var(--gray-400);font-size:14px;padding:20px 0}
+.ai-spinner{width:18px;height:18px;border:2px solid var(--gray-200);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-text{font-size:14px;line-height:1.8;color:var(--gray-800);white-space:pre-wrap}
+.timeline-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--gray-100)}
+.timeline-item:last-child{border:none}
+.timeline-dot{width:10px;height:10px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:4px}
+.timeline-date{font-size:12px;color:var(--gray-400);width:90px;flex-shrink:0;margin-top:2px}
+.timeline-event{font-size:13px;color:var(--gray-800);flex:1}
+.risk-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-100)}
+.risk-item:last-child{border:none}
+.risk-level-tag{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;flex-shrink:0;margin-top:1px}
+.risk-high-tag{background:#fee2e2;color:#b91c1c}
+.risk-med-tag{background:#fef3c7;color:#b45309}
+.risk-low-tag{background:#dcfce7;color:#166534}
+.risk-desc{font-size:13px;color:var(--gray-800);line-height:1.6}
+.demand-letter{font-size:13px;line-height:1.9;color:#1a1a1a;padding:16px;background:#fafafa;border-radius:6px;white-space:pre-wrap;border:1px solid var(--gray-200)}
+.ai-actions{display:flex;gap:8px;margin-top:12px}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-outline{background:#fff;color:var(--blue);border:1px solid var(--blue)}
+.btn-outline:hover{background:var(--sky)}
 </style>
 </head>
 <body>
 
-<!-- ════════ SIDEBAR ════════ -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon">⚖</div>
-    <div class="logo-text">律智<span>档案</span></div>
-  </div>
-
-  <nav class="sidebar-nav">
-    <div class="nav-section">
-      <div class="nav-item active" onclick="showPage('dashboard', this)">
-        <span class="nav-icon">🏠</span> 工作台
-      </div>
-      <div class="nav-item" onclick="showPage('cases', this)">
-        <span class="nav-icon">📁</span> 案件管理
-        <span class="nav-badge">12</span>
-      </div>
-      <div class="nav-item" onclick="showPage('docs', this)">
-        <span class="nav-icon">📂</span> 档案库
-      </div>
+<header class="site-header">
+  <a class="logo" href="#">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     </div>
+    <span class="logo-text">智法档案系统</span>
+  </a>
+  <span class="header-badge">当事人建档入口</span>
+</header>
 
-    <div class="nav-section">
-      <div class="nav-label">AI 工具</div>
-      <div class="nav-item" onclick="showPage('ai', this)">
-        <span class="nav-icon">🤖</span> AI 分析报告
-        <span class="nav-badge blue">3</span>
-      </div>
-      <div class="nav-item" onclick="window.open('drafting.html','_blank')">
-        <span class="nav-icon">✍️</span> 文书起草
-      </div>
-      <div class="nav-item" onclick="showPage('contracts', this)">
-        <span class="nav-icon">📋</span> 合同审查
-      </div>
-      <div class="nav-item" onclick="showPage('lawdb', this)">
-        <span class="nav-icon">⚖️</span> 法条检索
-      </div>
-    </div>
+<!-- API Key bar -->
+<div class="api-bar" id="apiBar">
+  <span>⚙️ DeepSeek API Key（用于AI分析）：</span>
+  <input type="password" id="apiKeyInput" placeholder="sk-..." />
+  <button onclick="saveApiKey()">保存</button>
+  <span id="apiBarMsg" style="display:none;color:#14532d">✓ 已保存</span>
+</div>
 
-    <div class="nav-section">
-      <div class="nav-label">业务模块</div>
-      <div class="nav-item" onclick="showPage('labor', this)">
-        <span class="nav-icon">👷</span> 劳动争议
+<!-- Tab navigation -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('intake')" id="tab-intake">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    新案登记
+  </button>
+  <button class="tab-btn" onclick="switchTab('dashboard')" id="tab-dashboard">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    案件看板
+    <span id="dashBadge" style="background:var(--blue);color:#fff;font-size:11px;padding:1px 7px;border-radius:10px;display:none">0</span>
+  </button>
+</nav>
+<div id="tabIntake" class="tab-panel active">
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="steps" id="progressSteps">
+      <div class="step active" data-step="1">
+        <div class="step-dot">1</div>
+        <span class="step-label">案件类型</span>
       </div>
-      <div class="nav-item" onclick="showPage('ip', this)">
-        <span class="nav-icon">💡</span> 知识产权
+      <div class="step-line"></div>
+      <div class="step" data-step="2">
+        <div class="step-dot">2</div>
+        <span class="step-label">基本信息</span>
       </div>
-      <div class="nav-item" onclick="showPage('compliance', this)">
-        <span class="nav-icon">📡</span> 法规动态
-        <span class="nav-badge">5</span>
+      <div class="step-line"></div>
+      <div class="step" data-step="3">
+        <div class="step-dot">3</div>
+        <span class="step-label">案情详情</span>
       </div>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-label">管理</div>
-      <div class="nav-item" onclick="showPage('analytics', this)">
-        <span class="nav-icon">📊</span> 数据统计
+      <div class="step-line"></div>
+      <div class="step" data-step="4">
+        <div class="step-dot">4</div>
+        <span class="step-label">材料上传</span>
       </div>
-      <div class="nav-item" onclick="showPage('settings', this)">
-        <span class="nav-icon">⚙️</span> 系统设置
-      </div>
-    </div>
-  </nav>
-
-  <div class="sidebar-user">
-    <div class="user-avatar">张</div>
-    <div class="user-info">
-      <div class="user-name">张明远 律师</div>
-      <div class="user-role">合伙人</div>
-    </div>
-  </div>
-</aside>
-
-<!-- ════════ MAIN ════════ -->
-<div class="main">
-  <!-- Topbar -->
-  <div class="topbar">
-    <div class="topbar-title" id="page-title">工作台</div>
-    <div class="topbar-search">
-      <span>🔍</span>
-      <input type="text" placeholder="搜索案件、当事人、法条…">
-    </div>
-    <button class="topbar-btn notif-dot" title="通知">🔔</button>
-    <button class="topbar-btn" title="帮助">❓</button>
-    <button class="new-case-btn" onclick="window.open('intake.html','_blank')">＋ 新建档案</button>
-  </div>
-
-  <!-- Content -->
-  <div class="content">
-
-    <!-- ── Dashboard ── -->
-    <div class="page-view active" id="page-dashboard">
-      <div class="stats-row">
-        <div class="stat-card stat-accent">
-          <div class="label">在办案件</div>
-          <div class="value">38</div>
-          <div class="change up">↑ 3 本月新增</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">本月新档</div>
-          <div class="value">12</div>
-          <div class="change up">↑ 较上月 +20%</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">本月结案</div>
-          <div class="value">7</div>
-          <div class="change down">↓ 较上月 -2</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">待处理事项</div>
-          <div class="value" style="color:var(--red)">9</div>
-          <div class="change down">4 件超期预警</div>
-        </div>
-      </div>
-
-      <div class="dash-grid">
-        <!-- Recent cases -->
-        <div>
-          <div class="card" style="margin-bottom:16px;">
-            <div class="card-header">
-              <h3>近期案件</h3>
-              <a onclick="showPage('cases', document.querySelector('.nav-item:nth-child(2)'))">查看全部 →</a>
-            </div>
-            <table class="case-table">
-              <thead>
-                <tr>
-                  <th>案件</th>
-                  <th>类型</th>
-                  <th>状态</th>
-                  <th>负责律师</th>
-                  <th>下次节点</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr onclick="openDrawer()">
-                  <td>
-                    <div class="case-id">2026-CV-0089</div>
-                    <div class="case-name">王某与李某房屋买卖合同纠纷</div>
-                    <div class="case-sub">当事人：王建国 | 标的额 ¥128万</div>
-                  </td>
-                  <td><span class="badge-type t-civil">民事</span></td>
-                  <td><span class="badge-status s-active"><span class="s-dot"></span>审理中</span></td>
-                  <td><div class="lawyer-avatar" style="background:#1d6fa4">张</div></td>
-                  <td><span style="color:var(--red);font-size:12px;font-weight:600;">6月15日 开庭</span></td>
-                </tr>
-                <tr onclick="openDrawer()">
-                  <td>
-                    <div class="case-id">2026-CR-0034</div>
-                    <div class="case-name">刘某故意伤害案辩护</div>
-                    <div class="case-sub">当事人：刘明 | 公安侦查阶段</div>
-                  </td>
-                  <td><span class="badge-type t-criminal">刑事</span></td>
-                  <td><span class="badge-status s-urgent"><span class="s-dot"></span>紧急</span></td>
-                  <td><div class="lawyer-avatar" style="background:#7c3aed">陈</div></td>
-                  <td><span style="color:var(--orange);font-size:12px;font-weight:600;">6月12日 会见</span></td>
-                </tr>
-                <tr onclick="openDrawer()">
-                  <td>
-                    <div class="case-id">2026-CM-0056</div>
-                    <div class="case-name">甲公司与乙公司货款纠纷</div>
-                    <div class="case-sub">当事人：甲贸易有限公司 | 标的额 ¥320万</div>
-                  </td>
-                  <td><span class="badge-type t-commercial">商事</span></td>
-                  <td><span class="badge-status s-active"><span class="s-dot"></span>审理中</span></td>
-                  <td><div class="lawyer-avatar" style="background:#1a8a5a">李</div></td>
-                  <td><span style="font-size:12px;color:var(--gray-600);">6月20日 质证</span></td>
-                </tr>
-                <tr onclick="openDrawer()">
-                  <td>
-                    <div class="case-id">2026-LB-0023</div>
-                    <div class="case-name">赵某劳动仲裁案</div>
-                    <div class="case-sub">当事人：赵英华 | 违法解除劳动合同</div>
-                  </td>
-                  <td><span class="badge-type t-labor">劳动</span></td>
-                  <td><span class="badge-status s-pending"><span class="s-dot"></span>仲裁中</span></td>
-                  <td><div class="lawyer-avatar" style="background:#e07b20">王</div></td>
-                  <td><span style="font-size:12px;color:var(--gray-600);">6月25日 开庭</span></td>
-                </tr>
-                <tr onclick="openDrawer()">
-                  <td>
-                    <div class="case-id">2026-AD-0011</div>
-                    <div class="case-name">某餐厅行政处罚复议</div>
-                    <div class="case-sub">当事人：鑫源餐饮管理有限公司</div>
-                  </td>
-                  <td><span class="badge-type t-admin">行政</span></td>
-                  <td><span class="badge-status s-pending"><span class="s-dot"></span>复议中</span></td>
-                  <td><div class="lawyer-avatar" style="background:#1d6fa4">张</div></td>
-                  <td><span style="font-size:12px;color:var(--gray-600);">7月3日 期限</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Activity -->
-          <div class="card">
-            <div class="card-header"><h3>最新动态</h3></div>
-            <div class="activity-list">
-              <div class="activity-item">
-                <div class="act-icon" style="background:#e8f1fb">📤</div>
-                <div class="act-body">
-                  <div class="act-text"><strong>陈律师</strong> 上传了 <strong>刘某故意伤害案</strong> 的审讯笔录（3份）</div>
-                  <div class="act-time">10分钟前 · AI自动识别分类完成</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="act-icon" style="background:#e6f7ee">🤖</div>
-                <div class="act-body">
-                  <div class="act-text">AI完成 <strong>王某房屋买卖纠纷</strong> 案件分析报告，识别3条关键法条</div>
-                  <div class="act-time">32分钟前</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="act-icon" style="background:#fff4e8">⚠️</div>
-                <div class="act-body">
-                  <div class="act-text"><strong>甲公司货款纠纷</strong> 答辩期限还剩 <strong style="color:var(--red)">3天</strong>，请尽快处理</div>
-                  <div class="act-time">1小时前 · 系统自动提醒</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="act-icon" style="background:#f3e8ff">📡</div>
-                <div class="act-body">
-                  <div class="act-text">法规动态：<strong>《劳动合同法》修订草案</strong>已公开征求意见，影响5个在办案件</div>
-                  <div class="act-time">2小时前</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="act-icon" style="background:#fdecea">📩</div>
-                <div class="act-body">
-                  <div class="act-text">收到新当事人建档申请：<strong>孙某离婚财产分割</strong>，待分配律师</div>
-                  <div class="act-time">3小时前</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right column -->
-        <div>
-          <!-- Deadlines -->
-          <div class="card" style="margin-bottom:16px;">
-            <div class="card-header"><h3>⏰ 期限预警</h3><a>全部</a></div>
-            <div class="deadline-list">
-              <div class="deadline-item">
-                <div class="dl-date urgent"><div class="day">12</div><div class="mon">6月</div></div>
-                <div class="dl-info">
-                  <div class="dl-name">律师会见申请</div>
-                  <div class="dl-case">刘某故意伤害案 · 刑事</div>
-                </div>
-                <span class="dl-tag" style="background:var(--red-light);color:var(--red)">2天</span>
-              </div>
-              <div class="deadline-item">
-                <div class="dl-date urgent"><div class="day">15</div><div class="mon">6月</div></div>
-                <div class="dl-info">
-                  <div class="dl-name">第二次开庭</div>
-                  <div class="dl-case">王某房屋买卖纠纷 · 民事</div>
-                </div>
-                <span class="dl-tag" style="background:var(--red-light);color:var(--red)">5天</span>
-              </div>
-              <div class="deadline-item">
-                <div class="dl-date warn"><div class="day">18</div><div class="mon">6月</div></div>
-                <div class="dl-info">
-                  <div class="dl-name">答辩状提交截止</div>
-                  <div class="dl-case">甲公司货款纠纷 · 商事</div>
-                </div>
-                <span class="dl-tag" style="background:var(--orange-light);color:var(--orange)">8天</span>
-              </div>
-              <div class="deadline-item">
-                <div class="dl-date ok"><div class="day">25</div><div class="mon">6月</div></div>
-                <div class="dl-info">
-                  <div class="dl-name">劳动仲裁开庭</div>
-                  <div class="dl-case">赵某违法解除案 · 劳动</div>
-                </div>
-                <span class="dl-tag" style="background:var(--blue-light);color:var(--blue)">15天</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quick stats -->
-          <div class="card">
-            <div class="card-header"><h3>📊 案件分布</h3></div>
-            <div style="padding:16px 20px;">
-              <div class="bar-chart">
-                <div class="bar-row">
-                  <div class="bar-name">民事</div>
-                  <div class="bar-track"><div class="bar-fill" style="width:42%;background:var(--blue)"><span>16</span></div></div>
-                </div>
-                <div class="bar-row">
-                  <div class="bar-name">商事</div>
-                  <div class="bar-track"><div class="bar-fill" style="width:28%;background:var(--orange)"><span>11</span></div></div>
-                </div>
-                <div class="bar-row">
-                  <div class="bar-name">劳动</div>
-                  <div class="bar-track"><div class="bar-fill" style="width:18%;background:var(--green)"><span>7</span></div></div>
-                </div>
-                <div class="bar-row">
-                  <div class="bar-name">刑事</div>
-                  <div class="bar-track"><div class="bar-fill" style="width:8%;background:#c0392b"><span>3</span></div></div>
-                </div>
-                <div class="bar-row">
-                  <div class="bar-name">行政</div>
-                  <div class="bar-track"><div class="bar-fill" style="width:3%;background:#7c3aed"><span>1</span></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Cases Page ── -->
-    <div class="page-view" id="page-cases">
-      <div class="page-toolbar">
-        <div class="filter-row">
-          <button class="filter-btn active">全部 (38)</button>
-          <button class="filter-btn">民事 (16)</button>
-          <button class="filter-btn">商事 (11)</button>
-          <button class="filter-btn">劳动 (7)</button>
-          <button class="filter-btn">刑事 (3)</button>
-          <button class="filter-btn">行政 (1)</button>
-        </div>
-        <div class="search-bar">
-          <span>🔍</span>
-          <input placeholder="搜索案件名称、案号…">
-        </div>
-      </div>
-      <div class="card">
-        <table class="case-table">
-          <thead>
-            <tr>
-              <th>案号 / 案件名称</th>
-              <th>类型</th>
-              <th>当事人</th>
-              <th>状态</th>
-              <th>负责律师</th>
-              <th>最近更新</th>
-              <th>下次期限</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr onclick="openDrawer()">
-              <td><div class="case-id">2026-CV-0089</div><div class="case-name">王某与李某房屋买卖合同纠纷</div></td>
-              <td><span class="badge-type t-civil">民事</span></td>
-              <td>王建国</td>
-              <td><span class="badge-status s-active"><span class="s-dot"></span>审理中</span></td>
-              <td><div class="lawyer-avatar" style="background:#1d6fa4">张</div></td>
-              <td style="color:var(--gray-400);font-size:12px;">今天 10:32</td>
-              <td style="color:var(--red);font-size:12px;font-weight:600;">6月15日</td>
-            </tr>
-            <tr onclick="openDrawer()">
-              <td><div class="case-id">2026-CR-0034</div><div class="case-name">刘某故意伤害案辩护</div></td>
-              <td><span class="badge-type t-criminal">刑事</span></td>
-              <td>刘明</td>
-              <td><span class="badge-status s-urgent"><span class="s-dot"></span>紧急</span></td>
-              <td><div class="lawyer-avatar" style="background:#7c3aed">陈</div></td>
-              <td style="color:var(--gray-400);font-size:12px;">今天 09:15</td>
-              <td style="color:var(--red);font-size:12px;font-weight:600;">6月12日</td>
-            </tr>
-            <tr onclick="openDrawer()">
-              <td><div class="case-id">2026-CM-0056</div><div class="case-name">甲公司与乙公司货款纠纷</div></td>
-              <td><span class="badge-type t-commercial">商事</span></td>
-              <td>甲贸易有限公司</td>
-              <td><span class="badge-status s-active"><span class="s-dot"></span>审理中</span></td>
-              <td><div class="lawyer-avatar" style="background:#1a8a5a">李</div></td>
-              <td style="color:var(--gray-400);font-size:12px;">昨天 16:40</td>
-              <td style="color:var(--orange);font-size:12px;font-weight:600;">6月18日</td>
-            </tr>
-            <tr onclick="openDrawer()">
-              <td><div class="case-id">2026-LB-0023</div><div class="case-name">赵某劳动仲裁案</div></td>
-              <td><span class="badge-type t-labor">劳动</span></td>
-              <td>赵英华</td>
-              <td><span class="badge-status s-pending"><span class="s-dot"></span>仲裁中</span></td>
-              <td><div class="lawyer-avatar" style="background:#e07b20">王</div></td>
-              <td style="color:var(--gray-400);font-size:12px;">6月8日</td>
-              <td style="color:var(--gray-600);font-size:12px;">6月25日</td>
-            </tr>
-            <tr onclick="openDrawer()">
-              <td><div class="case-id">2026-AD-0011</div><div class="case-name">某餐厅行政处罚复议</div></td>
-              <td><span class="badge-type t-admin">行政</span></td>
-              <td>鑫源餐饮管理有限公司</td>
-              <td><span class="badge-status s-pending"><span class="s-dot"></span>复议中</span></td>
-              <td><div class="lawyer-avatar" style="background:#1d6fa4">张</div></td>
-              <td style="color:var(--gray-400);font-size:12px;">6月7日</td>
-              <td style="color:var(--gray-600);font-size:12px;">7月3日</td>
-            </tr>
-            <tr onclick="openDrawer()">
-              <td><div class="case-id">2026-CV-0081</div><div class="case-name">张某离婚财产分割纠纷</div></td>
-              <td><span class="badge-type t-civil">民事</span></td>
-              <td>张丽华</td>
-              <td><span class="badge-status s-active"><span class="s-dot"></span>审理中</span></td>
-              <td><div class="lawyer-avatar" style="background:#1d6fa4">张</div></td>
-              <td style="color:var(--gray-400);font-size:12px;">6月5日</td>
-              <td style="color:var(--gray-600);font-size:12px;">7月10日</td>
-            </tr>
-            <tr onclick="openDrawer()">
-              <td><div class="case-id">2026-IP-0008</div><div class="case-name">某品牌商标侵权案</div></td>
-              <td><span class="badge-type t-ip">知识产权</span></td>
-              <td>锐驰科技有限公司</td>
-              <td><span class="badge-status s-pending"><span class="s-dot"></span>立案中</span></td>
-              <td><div class="lawyer-avatar" style="background:#c8960c">赵</div></td>
-              <td style="color:var(--gray-400);font-size:12px;">6月3日</td>
-              <td style="color:var(--gray-600);font-size:12px;">7月15日</td>
-            </tr>
-            <tr>
-              <td colspan="7" style="text-align:center;padding:20px;color:var(--gray-400);font-size:12px;">
-                显示 7 / 38 条案件 · <a style="color:var(--blue);cursor:pointer">加载更多</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── AI Page ── -->
-    <div class="page-view" id="page-ai">
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-header">
-          <h3>🤖 AI 分析报告</h3>
-          <a>生成新报告</a>
-        </div>
-        <table class="case-table">
-          <thead><tr><th>案件</th><th>报告类型</th><th>生成时间</th><th>关键发现</th><th>操作</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><div class="case-name">王某房屋买卖合同纠纷</div><div class="case-id">2026-CV-0089</div></td>
-              <td><span class="badge-type t-civil">IRAC分析</span></td>
-              <td style="font-size:12px;color:var(--gray-400)">今天 10:32</td>
-              <td style="font-size:12px">识别3条适用法条，胜诉概率 <strong style="color:var(--green)">78%</strong></td>
-              <td><a style="color:var(--blue);cursor:pointer;font-size:12px">查看报告</a></td>
-            </tr>
-            <tr>
-              <td><div class="case-name">刘某故意伤害案辩护</div><div class="case-id">2026-CR-0034</div></td>
-              <td><span class="badge-type t-criminal">要件分析</span></td>
-              <td style="font-size:12px;color:var(--gray-400)">今天 09:15</td>
-              <td style="font-size:12px">存在2处关键取证瑕疵，<strong style="color:var(--orange)">建议补充</strong></td>
-              <td><a style="color:var(--blue);cursor:pointer;font-size:12px">查看报告</a></td>
-            </tr>
-            <tr>
-              <td><div class="case-name">甲公司货款纠纷</div><div class="case-id">2026-CM-0056</div></td>
-              <td><span class="badge-type t-commercial">证据审查</span></td>
-              <td style="font-size:12px;color:var(--gray-400)">昨天 16:40</td>
-              <td style="font-size:12px">发现对方证据关联性不足，<strong style="color:var(--green)">有利于我方</strong></td>
-              <td><a style="color:var(--blue);cursor:pointer;font-size:12px">查看报告</a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── Law DB Page ── -->
-    <div class="page-view" id="page-lawdb">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <div class="card">
-          <div class="card-header"><h3>⚖️ 法条语义检索</h3></div>
-          <div style="padding:20px;">
-            <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:14px;margin-bottom:14px;">
-              <textarea style="width:100%;border:none;background:none;outline:none;font-size:13px;resize:none;font-family:inherit;color:var(--gray-800)" rows="3" placeholder="输入法律问题或案情描述，例如：租赁合同中房东单方解除合同是否需要赔偿？"></textarea>
-            </div>
-            <button style="background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 20px;cursor:pointer;font-size:13px;width:100%;">🔍 语义检索相关法条</button>
-          </div>
-          <div style="padding:0 20px 20px;">
-            <div style="font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">检索结果</div>
-            <div class="doc-item" style="margin-bottom:8px;">
-              <div style="font-size:18px">📜</div>
-              <div style="flex:1">
-                <div style="font-size:13px;font-weight:700;color:var(--navy)">《合同法》第二百三十二条</div>
-                <div style="font-size:12px;color:var(--gray-600);margin-top:2px">当事人可以约定租赁合同的解除……</div>
-              </div>
-              <span style="font-size:11px;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:4px;font-weight:700">相关度97%</span>
-            </div>
-            <div class="doc-item" style="margin-bottom:8px;">
-              <div style="font-size:18px">📜</div>
-              <div style="flex:1">
-                <div style="font-size:13px;font-weight:700;color:var(--navy)">《民法典》第七百二十二条</div>
-                <div style="font-size:12px;color:var(--gray-600);margin-top:2px">承租人无正当理由未支付或者迟延支付……</div>
-              </div>
-              <span style="font-size:11px;background:var(--blue-light);color:var(--blue);padding:2px 8px;border-radius:4px;font-weight:700">相关度89%</span>
-            </div>
-            <div class="doc-item">
-              <div style="font-size:18px">📜</div>
-              <div style="flex:1">
-                <div style="font-size:13px;font-weight:700;color:var(--navy)">最高法院租赁合同纠纷解释(2022)第十一条</div>
-                <div style="font-size:12px;color:var(--gray-600);margin-top:2px">出租人单方解除合同造成承租人损失的……</div>
-              </div>
-              <span style="font-size:11px;background:var(--blue-light);color:var(--blue);padding:2px 8px;border-radius:4px;font-weight:700">相关度82%</span>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3>最近检索</h3></div>
-          <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;">
-            <div style="padding:10px 14px;background:var(--gray-50);border-radius:8px;border:1px solid var(--gray-100);cursor:pointer;">
-              <div style="font-size:13px;font-weight:600;color:var(--gray-800)">劳动合同违法解除赔偿标准</div>
-              <div style="font-size:11px;color:var(--gray-400);margin-top:3px">匹配到 5 条法条 · 6月9日</div>
-            </div>
-            <div style="padding:10px 14px;background:var(--gray-50);border-radius:8px;border:1px solid var(--gray-100);cursor:pointer;">
-              <div style="font-size:13px;font-weight:600;color:var(--gray-800)">故意伤害罪量刑标准</div>
-              <div style="font-size:11px;color:var(--gray-400);margin-top:3px">匹配到 8 条法条 · 6月9日</div>
-            </div>
-            <div style="padding:10px 14px;background:var(--gray-50);border-radius:8px;border:1px solid var(--gray-100);cursor:pointer;">
-              <div style="font-size:13px;font-weight:600;color:var(--gray-800)">房屋买卖合同效力认定</div>
-              <div style="font-size:11px;color:var(--gray-400);margin-top:3px">匹配到 6 条法条 · 6月8日</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Compliance Page ── -->
-    <div class="page-view" id="page-compliance">
-      <div class="card">
-        <div class="card-header"><h3>📡 法规动态监控</h3><span style="font-size:11px;background:var(--red-light);color:var(--red);padding:2px 8px;border-radius:10px;font-weight:700">5 条新动态</span></div>
-        <div style="padding:0 20px 10px;">
-          <div class="activity-item" style="padding:16px 0;border-bottom:1px solid var(--gray-100);">
-            <div class="act-icon" style="background:var(--red-light)">🔴</div>
-            <div class="act-body">
-              <div class="act-text"><strong>《劳动合同法》修订草案</strong> · 国务院公开征求意见</div>
-              <div style="font-size:12px;color:var(--gray-600);margin-top:4px;line-height:1.6">主要变化：第39条增加无过失性辞退情形、经济补偿金计算基数调整。<strong style="color:var(--red)">影响在办 5 个劳动案件</strong></div>
-              <div class="act-time" style="margin-top:6px">2026-06-08 · 征求意见截止 2026-07-08</div>
-            </div>
-          </div>
-          <div class="activity-item" style="padding:16px 0;border-bottom:1px solid var(--gray-100);">
-            <div class="act-icon" style="background:var(--orange-light)">🟠</div>
-            <div class="act-body">
-              <div class="act-text"><strong>《个人信息保护法》实施细则（征求意见稿）</strong></div>
-              <div style="font-size:12px;color:var(--gray-600);margin-top:4px;line-height:1.6">进一步细化数据跨境传输规则及处罚标准，影响企业合规客户。</div>
-              <div class="act-time" style="margin-top:6px">2026-06-05</div>
-            </div>
-          </div>
-          <div class="activity-item" style="padding:16px 0;">
-            <div class="act-icon" style="background:var(--blue-light)">🔵</div>
-            <div class="act-body">
-              <div class="act-text"><strong>最高人民法院《关于审理劳动争议案件若干问题的解释（六）》</strong></div>
-              <div style="font-size:12px;color:var(--gray-600);margin-top:4px;line-height:1.6">已正式发布，2026年7月1日起施行。明确竞业限制补偿金计算规则。</div>
-              <div class="act-time" style="margin-top:6px">2026-06-01 · 已正式发布</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Analytics Page ── -->
-    <div class="page-view" id="page-analytics">
-      <div class="chart-grid">
-        <div class="chart-card">
-          <h3>月度新增案件趋势</h3>
-          <div class="bar-chart">
-            <div class="bar-row"><div class="bar-name">1月</div><div class="bar-track"><div class="bar-fill" style="width:50%;background:var(--blue)"><span>6</span></div></div></div>
-            <div class="bar-row"><div class="bar-name">2月</div><div class="bar-track"><div class="bar-fill" style="width:42%;background:var(--blue)"><span>5</span></div></div></div>
-            <div class="bar-row"><div class="bar-name">3月</div><div class="bar-track"><div class="bar-fill" style="width:67%;background:var(--blue)"><span>8</span></div></div></div>
-            <div class="bar-row"><div class="bar-name">4月</div><div class="bar-track"><div class="bar-fill" style="width:75%;background:var(--blue)"><span>9</span></div></div></div>
-            <div class="bar-row"><div class="bar-name">5月</div><div class="bar-track"><div class="bar-fill" style="width:83%;background:var(--blue)"><span>10</span></div></div></div>
-            <div class="bar-row"><div class="bar-name">6月</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--navy)"><span>12</span></div></div></div>
-          </div>
-        </div>
-        <div class="chart-card">
-          <h3>案件类型分布</h3>
-          <div class="donut-row">
-            <svg width="120" height="120" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e2e8f0" stroke-width="3.8"/>
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1d6fa4" stroke-width="3.8" stroke-dasharray="42 58" stroke-dashoffset="25"/>
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e07b20" stroke-width="3.8" stroke-dasharray="29 71" stroke-dashoffset="-17"/>
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1a8a5a" stroke-width="3.8" stroke-dasharray="18 82" stroke-dashoffset="-46"/>
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#c0392b" stroke-width="3.8" stroke-dasharray="8 92" stroke-dashoffset="-64"/>
-              <text x="18" y="20" text-anchor="middle" font-size="6" fill="#0f2850" font-weight="bold">38件</text>
-            </svg>
-            <div class="donut-legend">
-              <div class="legend-item2"><div class="legend-dot2" style="background:#1d6fa4"></div>民事 16件 (42%)</div>
-              <div class="legend-item2"><div class="legend-dot2" style="background:#e07b20"></div>商事 11件 (29%)</div>
-              <div class="legend-item2"><div class="legend-dot2" style="background:#1a8a5a"></div>劳动 7件 (18%)</div>
-              <div class="legend-item2"><div class="legend-dot2" style="background:#c0392b"></div>刑事 3件 (8%)</div>
-              <div class="legend-item2"><div class="legend-dot2" style="background:#7c3aed"></div>行政 1件 (3%)</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="chart-card" style="max-width:100%">
-        <h3>律师工作量统计（本月）</h3>
-        <div class="bar-chart" style="margin-top:4px;">
-          <div class="bar-row"><div class="bar-name" style="width:80px">张明远</div><div class="bar-track"><div class="bar-fill" style="width:85%;background:var(--navy)"><span>17件</span></div></div></div>
-          <div class="bar-row"><div class="bar-name" style="width:80px">陈美玲</div><div class="bar-track"><div class="bar-fill" style="width:60%;background:var(--blue)"><span>12件</span></div></div></div>
-          <div class="bar-row"><div class="bar-name" style="width:80px">李国强</div><div class="bar-track"><div class="bar-fill" style="width:45%;background:var(--blue)"><span>9件</span></div></div></div>
-          <div class="bar-row"><div class="bar-name" style="width:80px">王晓燕</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--blue)"><span>6件</span></div></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Other placeholder pages ── -->
-    <div class="page-view" id="page-docs">
-      <div class="empty-state"><div class="icon">📂</div><p>档案库 · 开发中</p></div>
-    </div>
-    <div class="page-view" id="page-drafting">
-      <div class="empty-state">
-        <div class="icon">✍️</div>
-        <p>正在跳转到文书起草工作台…</p>
-        <script>if(document.getElementById('page-drafting').classList.contains('active'))window.open('drafting.html','_blank');</script>
-      </div>
-    </div>
-    <div class="page-view" id="page-contracts">
-      <div class="empty-state"><div class="icon">📋</div><p>合同审查模块 · 开发中</p></div>
-    </div>
-    <div class="page-view" id="page-labor">
-      <div class="empty-state"><div class="icon">👷</div><p>劳动争议专项 · 开发中</p></div>
-    </div>
-    <div class="page-view" id="page-ip">
-      <div class="empty-state"><div class="icon">💡</div><p>知识产权管理 · 开发中</p></div>
-    </div>
-    <div class="page-view" id="page-settings">
-      <div class="empty-state"><div class="icon">⚙️</div><p>系统设置 · 开发中</p></div>
-    </div>
-
-  </div><!-- /content -->
-</div><!-- /main -->
-
-<!-- ════════ CASE DRAWER ════════ -->
-<div class="modal-overlay" id="drawer-overlay" onclick="closeDrawer(event)">
-  <div class="case-drawer" onclick="event.stopPropagation()">
-    <div class="drawer-header">
-      <div>
-        <h2>王某与李某房屋买卖合同纠纷</h2>
-        <div class="meta">
-          <span>📌 案号：2026-CV-0089</span>
-          <span>⚖️ 民事 · 合同纠纷</span>
-          <span>📅 立案：2026-03-12</span>
-        </div>
-      </div>
-      <button class="drawer-close" onclick="closeDrawer()">✕</button>
-    </div>
-    <div class="drawer-tabs">
-      <div class="drawer-tab active" onclick="switchTab(this,'tab-overview')">概览</div>
-      <div class="drawer-tab" onclick="switchTab(this,'tab-docs')">档案材料</div>
-      <div class="drawer-tab" onclick="switchTab(this,'tab-timeline')">大事记</div>
-      <div class="drawer-tab" onclick="switchTab(this,'tab-ai')">AI分析</div>
-    </div>
-
-    <!-- Tab: 概览 -->
-    <div class="drawer-body" id="tab-overview">
-      <div class="detail-grid">
-        <div class="detail-field"><label>当事人（原告）</label><p>王建国</p></div>
-        <div class="detail-field"><label>对方当事人（被告）</label><p>李德强</p></div>
-        <div class="detail-field"><label>负责律师</label><p>张明远（合伙人）</p></div>
-        <div class="detail-field"><label>案件标的额</label><p style="color:var(--navy);font-weight:700">¥ 1,280,000</p></div>
-        <div class="detail-field"><label>受理法院</label><p>XX市中级人民法院</p></div>
-        <div class="detail-field"><label>案件状态</label><p><span class="badge-status s-active"><span class="s-dot"></span>审理中 · 第二次开庭</span></p></div>
-      </div>
-      <div class="detail-field" style="margin-bottom:16px;">
-        <label>案情摘要</label>
-        <p style="margin-top:4px;line-height:1.8;color:var(--gray-600)">原告王建国与被告李德强于2025年9月签订房屋买卖合同，约定购买位于XX路XX号房产，总价128万元。原告已支付定金30万元，但被告以市场价格上涨为由拒绝履行合同并要求退还定金。原告主张继续履行合同或双倍返还定金。</p>
-      </div>
-      <div class="detail-field">
-        <label>下次期限提醒</label>
-        <p style="color:var(--red);font-weight:700;margin-top:4px">⏰ 6月15日 · 第二次开庭（距今5天）</p>
-      </div>
-    </div>
-
-    <!-- Tab: 档案材料 -->
-    <div class="drawer-body" id="tab-docs" style="display:none">
-      <div class="doc-list">
-        <div class="doc-item">
-          <div class="doc-icon">📄</div>
-          <div>
-            <div class="doc-name">委托代理合同.pdf</div>
-            <div class="doc-meta">上传于 2026-03-12 · 1.2MB · AI已识别</div>
-          </div>
-          <span class="doc-action">查看</span>
-        </div>
-        <div class="doc-item">
-          <div class="doc-icon">📄</div>
-          <div>
-            <div class="doc-name">房屋买卖合同（原件扫描）.pdf</div>
-            <div class="doc-meta">上传于 2026-03-12 · 3.4MB · OCR完成</div>
-          </div>
-          <span class="doc-action">查看</span>
-        </div>
-        <div class="doc-item">
-          <div class="doc-icon">📝</div>
-          <div>
-            <div class="doc-name">起诉状（初稿）.docx</div>
-            <div class="doc-meta">上传于 2026-03-20 · 38KB · AI辅助生成</div>
-          </div>
-          <span class="doc-action">查看</span>
-        </div>
-        <div class="doc-item">
-          <div class="doc-icon">🏦</div>
-          <div>
-            <div class="doc-name">定金支付凭证（转账记录）.pdf</div>
-            <div class="doc-meta">上传于 2026-03-15 · 245KB · 证据材料</div>
-          </div>
-          <span class="doc-action">查看</span>
-        </div>
-        <div class="doc-item">
-          <div class="doc-icon">📋</div>
-          <div>
-            <div class="doc-name">法院受理通知书.pdf</div>
-            <div class="doc-meta">上传于 2026-04-02 · 180KB · 法院文书</div>
-          </div>
-          <span class="doc-action">查看</span>
-        </div>
-        <div class="doc-item">
-          <div class="doc-icon">📋</div>
-          <div>
-            <div class="doc-name">被告答辩状.pdf</div>
-            <div class="doc-meta">上传于 2026-04-18 · 290KB · AI已分析</div>
-          </div>
-          <span class="doc-action">查看</span>
-        </div>
-      </div>
-      <button style="margin-top:14px;width:100%;border:2px dashed var(--gray-200);background:none;border-radius:8px;padding:12px;color:var(--gray-400);cursor:pointer;font-size:13px;">＋ 上传新材料</button>
-    </div>
-
-    <!-- Tab: 大事记 -->
-    <div class="drawer-body" id="tab-timeline" style="display:none">
-      <div class="timeline-list">
-        <div class="tl-item">
-          <div class="tl-dot done"></div>
-          <div class="tl-date">2025-09-15</div>
-          <div class="tl-text">双方签订房屋买卖合同，约定总价128万元</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-dot done"></div>
-          <div class="tl-date">2025-10-03</div>
-          <div class="tl-text">原告支付定金30万元（银行转账凭证）</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-dot done"></div>
-          <div class="tl-date">2026-02-10</div>
-          <div class="tl-text">被告以市场价涨为由拒绝履约，发送书面拒绝函</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-dot done"></div>
-          <div class="tl-date">2026-03-12</div>
-          <div class="tl-text">当事人委托本所，签订委托代理合同，缴纳代理费</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-dot done"></div>
-          <div class="tl-date">2026-04-02</div>
-          <div class="tl-text">法院受理案件，立案编号 2026-CV-0089</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-dot done"></div>
-          <div class="tl-date">2026-05-18</div>
-          <div class="tl-text">第一次开庭，双方陈述事实，法庭组织调解未果</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-dot urgent"></div>
-          <div class="tl-date" style="color:var(--red);font-weight:600">2026-06-15 · 距今5天</div>
-          <div class="tl-text" style="color:var(--red);font-weight:600">⚡ 第二次开庭 · 重点：定金合同效力与履行判定</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tab: AI分析 -->
-    <div class="drawer-body" id="tab-ai" style="display:none">
-      <div class="ai-analysis">
-        <div class="ai-header">
-          <span style="font-size:20px">🤖</span>
-          <h4>AI案件分析报告</h4>
-          <span class="ai-chip">Qwen3 · 本地生成</span>
-          <span style="margin-left:auto;font-size:11px;color:var(--gray-400)">2026-06-10 10:32</span>
-        </div>
-        <div class="ai-section">
-          <h5>争议焦点</h5>
-          <p>1. 涉案买卖合同是否合法有效；2. 被告拒绝履约是否构成违约；3. 原告主张双倍返还定金的请求是否成立。</p>
-        </div>
-        <div class="ai-section">
-          <h5>适用法条</h5>
-          <p>
-            <span class="law-tag">《民法典》第587条（定金罚则）</span>
-            <span class="law-tag">《民法典》第577条（违约责任）</span>
-            <span class="law-tag">《民法典》第465条（合同效力）</span>
-          </p>
-        </div>
-        <div class="ai-section">
-          <h5>案情分析</h5>
-          <p>双方签订的买卖合同内容明确、当事人具有完全民事行为能力，合同合法有效。被告仅以市场价格上涨为由拒绝履约，不属于不可抗力或情势变更，应认定为违约。根据《民法典》第587条，原告有权主张双倍返还定金即60万元，亦可选择主张继续履行。</p>
-        </div>
-        <div class="ai-section">
-          <h5>胜诉概率评估</h5>
-          <div class="risk-bar">
-            <div class="risk-label">胜诉</div>
-            <div class="risk-track"><div class="risk-fill" style="width:78%;background:var(--green)"></div></div>
-            <span style="font-size:13px;font-weight:700;color:var(--green);width:36px">78%</span>
-          </div>
-          <div class="risk-bar" style="margin-top:6px">
-            <div class="risk-label">调解</div>
-            <div class="risk-track"><div class="risk-fill" style="width:18%;background:var(--orange)"></div></div>
-            <span style="font-size:13px;font-weight:700;color:var(--orange);width:36px">18%</span>
-          </div>
-        </div>
-        <div class="ai-section">
-          <h5>建议</h5>
-          <p>开庭前重点准备定金支付凭证的真实性证明链；关注对方是否会提出情势变更抗辩，准备好反驳材料（近年类似判决表明情势变更不适用于普通市场价格波动）。</p>
-        </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="5">
+        <div class="step-dot">5</div>
+        <span class="step-label">确认提交</span>
       </div>
     </div>
   </div>
 </div>
 
+<main class="main">
+
+<!-- ===== STEP 1: 案件类型 ===== -->
+<div class="step-page active" id="step1">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+        请选择案件类型
+      </div>
+      <div class="card-subtitle">根据您的案件性质选择对应类型，系统将为您展示对应的信息收集项</div>
+    </div>
+    <div class="card-body">
+      <div class="type-grid">
+        <div class="type-card" data-type="civil" onclick="selectType(this,'civil')">
+          <div class="type-icon">⚖️</div>
+          <div class="type-name">民事案件</div>
+          <div class="type-desc">合同纠纷、侵权损害、婚姻家庭、继承、劳动争议等</div>
+        </div>
+        <div class="type-card" data-type="criminal" onclick="selectType(this,'criminal')">
+          <div class="type-icon">🔒</div>
+          <div class="type-name">刑事案件</div>
+          <div class="type-desc">刑事辩护、刑事自诉、取保候审申请等</div>
+        </div>
+        <div class="type-card" data-type="commercial" onclick="selectType(this,'commercial')">
+          <div class="type-icon">🏢</div>
+          <div class="type-name">商事案件</div>
+          <div class="type-desc">公司股权、合同审查、商事仲裁、企业并购等</div>
+        </div>
+        <div class="type-card" data-type="admin" onclick="selectType(this,'admin')">
+          <div class="type-icon">🏛️</div>
+          <div class="type-name">行政案件</div>
+          <div class="type-desc">行政诉讼、行政复议、政府信息公开等</div>
+        </div>
+      </div>
+
+      <div class="nav-bar">
+        <div></div>
+        <button class="btn btn-primary" onclick="goStep(2)" id="step1Next" disabled>
+          下一步
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STEP 2: 基本信息 ===== -->
+<div class="step-page" id="step2">
+  <div class="notice notice-blue">
+    <strong>隐私声明：</strong>您填写的所有信息仅用于本律所办案，存储于本地加密服务器，不会上传至任何第三方云平台。
+  </div>
+
+  <!-- 委托人信息 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        委托人基本信息
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="form-row cols-2">
+        <div class="form-group" id="fg-name">
+          <label class="form-label required">姓名 / 企业名称</label>
+          <input class="form-control" id="f-name" type="text" placeholder="请输入真实姓名或企业全称">
+          <span class="error-msg">请填写姓名</span>
+        </div>
+        <div class="form-group" id="fg-idtype">
+          <label class="form-label required">证件类型</label>
+          <select class="form-control" id="f-idtype" onchange="toggleIdType()">
+            <option value="">请选择</option>
+            <option value="idcard">居民身份证</option>
+            <option value="passport">护照</option>
+            <option value="bizlicense">营业执照</option>
+            <option value="hkmacao">港澳通行证</option>
+            <option value="other">其他</option>
+          </select>
+          <span class="error-msg">请选择证件类型</span>
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group" id="fg-idno">
+          <label class="form-label required">证件号码</label>
+          <input class="form-control" id="f-idno" type="text" placeholder="请输入证件号码">
+          <span class="error-msg">请填写证件号码</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label required">联系电话</label>
+          <input class="form-control" id="f-phone" type="tel" placeholder="请输入手机号码">
+          <span class="error-msg" id="err-phone">请填写联系电话</span>
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">电子邮箱</label>
+          <input class="form-control" id="f-email" type="email" placeholder="用于接收案件进度通知（选填）">
+        </div>
+        <div class="form-group">
+          <label class="form-label required">委托人身份</label>
+          <select class="form-control" id="f-role">
+            <option value="">请选择</option>
+            <option value="plaintiff">原告 / 申请人</option>
+            <option value="defendant">被告 / 被申请人</option>
+            <option value="third">第三人</option>
+            <option value="criminal_defendant">刑事被告人家属</option>
+            <option value="victim">受害人 / 被害人</option>
+            <option value="company">企业法人代表</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row cols-1">
+        <div class="form-group">
+          <label class="form-label">通讯地址</label>
+          <input class="form-control" id="f-addr" type="text" placeholder="省/市/区/街道/门牌号（选填）">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 对方当事人 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        对方当事人信息
+      </div>
+      <div class="card-subtitle">如有多个对方当事人，请在后续沟通时补充</div>
+    </div>
+    <div class="card-body">
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label required">对方姓名 / 企业名称</label>
+          <input class="form-control" id="f-opp-name" type="text" placeholder="请输入对方真实姓名或企业全称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">对方联系方式</label>
+          <input class="form-control" id="f-opp-contact" type="text" placeholder="电话或地址（如已知）">
+        </div>
+      </div>
+
+      <!-- 商事特有：企业信息 -->
+      <div class="conditional-panel" id="cp-commercial-opp">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">对方统一社会信用代码</label>
+            <input class="form-control" id="f-opp-uscc" type="text" placeholder="18位统一社会信用代码（选填）">
+          </div>
+          <div class="form-group">
+            <label class="form-label">对方法定代表人</label>
+            <input class="form-control" id="f-opp-legal-rep" type="text" placeholder="公司法人（选填）">
+          </div>
+        </div>
+      </div>
+
+      <!-- 行政特有：行政机关信息 -->
+      <div class="conditional-panel" id="cp-admin-opp">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">行政机关名称</label>
+            <input class="form-control" id="f-admin-organ" type="text" placeholder="作出行政行为的机关全称">
+          </div>
+          <div class="form-group">
+            <label class="form-label">行政行为类型</label>
+            <select class="form-control" id="f-admin-act-type">
+              <option value="">请选择</option>
+              <option>行政处罚</option>
+              <option>行政许可</option>
+              <option>行政强制</option>
+              <option>行政复议</option>
+              <option>政府信息公开</option>
+              <option>其他行政行为</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goStep(1)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      上一步
+    </button>
+    <button class="btn btn-primary" onclick="validateStep2()">
+      下一步
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ===== STEP 3: 案情详情 ===== -->
+<div class="step-page" id="step3">
+
+  <!-- 通用：案情概述 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        案情经过
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label required">案件发生时间</label>
+          <input class="form-control" id="f-incident-date" type="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">案件发生地点</label>
+          <input class="form-control" id="f-incident-place" type="text" placeholder="省/市/区/具体地点">
+        </div>
+      </div>
+      <div class="form-row cols-1">
+        <div class="form-group" id="fg-facts">
+          <label class="form-label required">案件事实陈述</label>
+          <textarea class="form-control" id="f-facts" style="min-height:130px" placeholder="请尽量详细描述事情经过，包括：时间、地点、相关人员、发生了什么、造成了什么损失或后果……"></textarea>
+          <span class="error-msg">请简要描述案件经过</span>
+          <span class="form-hint">建议300字以上，描述越详细，律师分析越准确</span>
+        </div>
+      </div>
+      <div class="form-row cols-1">
+        <div class="form-group">
+          <label class="form-label required">您的诉求</label>
+          <textarea class="form-control" id="f-claim" style="min-height:80px" placeholder="您希望通过法律途径达到什么目的？例如：要求对方赔偿损失10万元、要求履行合同……"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 民事特有 -->
+  <div class="conditional-panel" id="cp-civil-details">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          民事案件补充信息
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">纠纷类型</label>
+            <select class="form-control" id="f-civil-type">
+              <option value="">请选择</option>
+              <option>合同纠纷</option>
+              <option>侵权损害赔偿</option>
+              <option>婚姻家庭</option>
+              <option>继承纠纷</option>
+              <option>房产纠纷</option>
+              <option>劳动争议</option>
+              <option>借贷纠纷</option>
+              <option>物权纠纷</option>
+              <option>其他民事纠纷</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">涉案金额（元）</label>
+            <input class="form-control" id="f-civil-amount" type="number" placeholder="如涉及财产，请填写争议金额">
+          </div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">是否已有判决/裁定</label>
+            <select class="form-control" id="f-civil-prior">
+              <option value="">请选择</option>
+              <option value="no">无，首次起诉</option>
+              <option value="first">一审判决，需上诉</option>
+              <option value="appeal">二审，需再审</option>
+              <option value="enforce">已判决，需申请执行</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">是否存在证据</label>
+            <select class="form-control" id="f-civil-evidence">
+              <option value="">请选择</option>
+              <option value="yes">有书面/电子证据</option>
+              <option value="partial">部分有证据</option>
+              <option value="no">证据不足</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 刑事特有 -->
+  <div class="conditional-panel" id="cp-criminal-details">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+          刑事案件补充信息
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="notice notice-amber">
+          <strong>提示：</strong>刑事案件涉及个人人身自由，请如实填写，律师将根据实际情况依法维权。
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">当前案件状态</label>
+            <select class="form-control" id="f-crim-status">
+              <option value="">请选择</option>
+              <option>当事人被拘留</option>
+              <option>当事人被逮捕</option>
+              <option>已取保候审</option>
+              <option>已移送起诉</option>
+              <option>一审开庭中</option>
+              <option>已判决，需上诉</option>
+              <option>服刑中，需减刑/假释</option>
+              <option>被害人，需追诉</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">涉嫌罪名（如已知）</label>
+            <input class="form-control" id="f-crim-charge" type="text" placeholder="如：故意伤害罪、诈骗罪等">
+          </div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">是否已会见当事人</label>
+            <select class="form-control" id="f-crim-meet">
+              <option value="">请选择</option>
+              <option value="yes">已会见</option>
+              <option value="no">尚未会见</option>
+              <option value="na">不适用（本人填写）</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">羁押/关押地点</label>
+            <input class="form-control" id="f-crim-location" type="text" placeholder="看守所/监狱名称（如已知）">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 商事特有 -->
+  <div class="conditional-panel" id="cp-commercial-details">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
+          商事案件补充信息
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">商事纠纷类型</label>
+            <select class="form-control" id="f-comm-type">
+              <option value="">请选择</option>
+              <option>买卖合同纠纷</option>
+              <option>服务合同纠纷</option>
+              <option>股权纠纷</option>
+              <option>公司解散</option>
+              <option>商事仲裁</option>
+              <option>知识产权纠纷</option>
+              <option>企业并购</option>
+              <option>破产重整</option>
+              <option>其他商事纠纷</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">是否存在合同文本</label>
+            <select class="form-control" id="f-comm-contract">
+              <option value="">请选择</option>
+              <option value="yes">有书面合同</option>
+              <option value="electronic">仅有电子协议</option>
+              <option value="verbal">口头约定，无书面合同</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">涉案金额（元）</label>
+            <input class="form-control" id="f-comm-amount" type="number" placeholder="合同金额或争议金额">
+          </div>
+          <div class="form-group">
+            <label class="form-label">是否已有仲裁/诉讼</label>
+            <select class="form-control" id="f-comm-prior">
+              <option value="">请选择</option>
+              <option value="none">尚未启动</option>
+              <option value="arbitration">已申请仲裁</option>
+              <option value="litigation">已提起诉讼</option>
+              <option value="both">仲裁与诉讼并行</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 行政特有 -->
+  <div class="conditional-panel" id="cp-admin-details">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          行政案件补充信息
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">行政行为作出时间</label>
+            <input class="form-control" id="f-admin-date" type="date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">是否已申请行政复议</label>
+            <select class="form-control" id="f-admin-reconsider">
+              <option value="">请选择</option>
+              <option value="no">未申请，直接诉讼</option>
+              <option value="pending">已申请，待结果</option>
+              <option value="denied">复议维持，需诉讼</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row cols-1">
+          <div class="form-group">
+            <label class="form-label">行政文书文号（如有）</label>
+            <input class="form-control" id="f-admin-docno" type="text" placeholder="行政处罚决定书、行政许可决定书等文号">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 补充意见 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        补充说明
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="form-row cols-1">
+        <div class="form-group">
+          <label class="form-label">其他需要说明的情况</label>
+          <textarea class="form-control" id="f-extra" placeholder="如有其他律师需了解的信息，请在此补充（选填）"></textarea>
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">期望委托方式</label>
+          <select class="form-control" id="f-engage-mode">
+            <option value="">请选择</option>
+            <option>代理诉讼（全程代理）</option>
+            <option>法律咨询（仅咨询）</option>
+            <option>合同审查</option>
+            <option>非诉讼法律服务</option>
+            <option>风险评估</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">期望首次会面时间</label>
+          <input class="form-control" id="f-meeting-date" type="date">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goStep(2)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      上一步
+    </button>
+    <button class="btn btn-primary" onclick="validateStep3()">
+      下一步
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ===== STEP 4: 材料上传 ===== -->
+<div class="step-page" id="step4">
+  <div class="notice notice-blue">
+    <strong>上传说明：</strong>支持 PDF、Word、图片（JPG/PNG）格式，每个文件不超过 20MB。材料越完整，律师分析越准确。
+  </div>
+
+  <!-- 通用材料 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        身份证明材料 <span style="font-size:12px;color:var(--gray-400);font-weight:400;margin-left:6px">必填</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="upload-area" onclick="triggerUpload('upload-id')">
+        <div class="upload-icon">📄</div>
+        <div class="upload-title">点击上传身份证明</div>
+        <div class="upload-hint">身份证正反面 / 营业执照扫描件</div>
+        <input type="file" class="upload-input" id="upload-id" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="handleUpload(this,'list-id')">
+      </div>
+      <div class="file-list" id="list-id"></div>
+    </div>
+  </div>
+
+  <!-- 案件相关材料 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
+        案件相关材料
+      </div>
+      <div class="card-subtitle" id="upload-hint-text">请上传与案件相关的证明文件、合同、聊天记录等</div>
+    </div>
+    <div class="card-body">
+      <!-- 民事/商事：合同协议 -->
+      <div class="conditional-panel" id="cp-upload-contract">
+        <div class="section-divider">合同 / 协议文件</div>
+        <div class="upload-area" onclick="triggerUpload('upload-contract')">
+          <div class="upload-icon">📋</div>
+          <div class="upload-title">点击上传合同文件</div>
+          <div class="upload-hint">合同原件、补充协议、修订版本等</div>
+          <input type="file" class="upload-input" id="upload-contract" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleUpload(this,'list-contract')">
+        </div>
+        <div class="file-list" id="list-contract"></div>
+      </div>
+
+      <!-- 刑事：司法文书 -->
+      <div class="conditional-panel" id="cp-upload-criminal">
+        <div class="section-divider">司法文书</div>
+        <div class="upload-area" onclick="triggerUpload('upload-judicial')">
+          <div class="upload-icon">⚖️</div>
+          <div class="upload-title">点击上传司法文书</div>
+          <div class="upload-hint">拘留证、逮捕证、起诉书、判决书等</div>
+          <input type="file" class="upload-input" id="upload-judicial" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleUpload(this,'list-judicial')">
+        </div>
+        <div class="file-list" id="list-judicial"></div>
+      </div>
+
+      <!-- 行政：行政文书 -->
+      <div class="conditional-panel" id="cp-upload-admin">
+        <div class="section-divider">行政文书</div>
+        <div class="upload-area" onclick="triggerUpload('upload-admin-doc')">
+          <div class="upload-icon">🏛️</div>
+          <div class="upload-title">点击上传行政文书</div>
+          <div class="upload-hint">行政处罚决定书、行政复议决定书等</div>
+          <input type="file" class="upload-input" id="upload-admin-doc" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleUpload(this,'list-admin-doc')">
+        </div>
+        <div class="file-list" id="list-admin-doc"></div>
+      </div>
+
+      <!-- 通用：证据材料 -->
+      <div class="section-divider">证据材料</div>
+      <div class="upload-area" onclick="triggerUpload('upload-evidence')">
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-title">点击上传证据材料</div>
+        <div class="upload-hint">聊天记录截图、付款凭证、照片、录音转录文件等</div>
+        <input type="file" class="upload-input" id="upload-evidence" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleUpload(this,'list-evidence')">
+      </div>
+      <div class="file-list" id="list-evidence"></div>
+
+      <!-- 通用：其他材料 -->
+      <div class="section-divider">其他补充材料</div>
+      <div class="upload-area" onclick="triggerUpload('upload-other')">
+        <div class="upload-icon">📎</div>
+        <div class="upload-title">点击上传其他材料</div>
+        <div class="upload-hint">其他任何有助于律师了解案情的文件</div>
+        <input type="file" class="upload-input" id="upload-other" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleUpload(this,'list-other')">
+      </div>
+      <div class="file-list" id="list-other"></div>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goStep(3)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      上一步
+    </button>
+    <button class="btn btn-primary" onclick="goStep(5)">
+      下一步，确认信息
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ===== STEP 5: 确认提交 ===== -->
+<div class="step-page" id="step5">
+  <div class="notice notice-amber">
+    <strong>提交前请仔细核对以下信息。</strong>提交后信息将进入律所档案系统，如需修改请联系接待律师。
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+        信息确认
+      </div>
+    </div>
+    <div class="card-body" id="summaryContent">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- 授权声明 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        委托声明与授权
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="notice notice-blue" style="margin-bottom:16px">
+        <strong>本律所隐私政策摘要：</strong>
+        <ul>
+          <li>您提供的所有信息仅用于本次法律委托服务</li>
+          <li>数据存储于本地加密服务器，不对外传输</li>
+          <li>未经您书面授权，不向任何第三方披露</li>
+          <li>案件结案后，档案按规定期限保存</li>
+        </ul>
+      </div>
+      <label class="checkbox-item" id="agree-checkbox" onclick="toggleAgree(this)" style="padding:12px 16px;border-radius:6px;display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+        <input type="checkbox" id="agree-check" style="margin-top:2px;flex-shrink:0">
+        <span style="font-size:13px;line-height:1.6">本人确认以上填写信息真实准确，授权贵律所处理本人案件相关信息，同意贵律所按照上述隐私政策使用本人数据，并了解本次填写提交不构成正式委托合同关系（正式委托需签署委托合同）。</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="btn btn-secondary" onclick="goStep(4)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      上一步
+    </button>
+    <button class="btn btn-success btn-lg" id="submitBtn" onclick="submitForm()" disabled>
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      确认提交建档
+    </button>
+  </div>
+</div>
+
+<!-- ===== STEP 6: 成功 ===== -->
+<div class="step-page" id="step6">
+  <div class="card">
+    <div class="success-hero">
+      <div class="success-circle">✓</div>
+      <div class="success-title">建档成功</div>
+      <div class="success-sub">您的案件信息已成功录入档案系统<br>律师将在1个工作日内与您联系</div>
+      <div class="case-number-box" id="caseNumberDisplay">ZF-2026-XXXXXX</div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-secondary" onclick="window.print()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          打印回执
+        </button>
+        <button class="btn btn-primary" onclick="location.reload()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          新建案件
+        </button>
+        <button class="btn btn-outline btn-sm" onclick="switchTab('dashboard')">查看案件看板 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Analysis panel (populated by submitForm) -->
+  <div class="ai-panel" id="aiPanel" style="display:none">
+    <div class="ai-panel-header">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      <h4>AI 案情分析 · 仅供律师参考，不构成法律意见</h4>
+    </div>
+    <div class="ai-tabs">
+      <button class="ai-tab active" onclick="switchAiTab('briefing',this)">案情摘要</button>
+      <button class="ai-tab" onclick="switchAiTab('timeline',this)">事件时间线</button>
+      <button class="ai-tab" onclick="switchAiTab('risks',this)">风险提示</button>
+      <button class="ai-tab" onclick="switchAiTab('demand',this)">催告函草稿</button>
+    </div>
+    <div class="ai-content">
+      <div class="ai-section active" id="ai-briefing"><div class="ai-loading"><div class="ai-spinner"></div>正在生成案情摘要…</div></div>
+      <div class="ai-section" id="ai-timeline"><div class="ai-loading"><div class="ai-spinner"></div>正在整理事件时间线…</div></div>
+      <div class="ai-section" id="ai-risks"><div class="ai-loading"><div class="ai-spinner"></div>正在评估法律风险…</div></div>
+      <div class="ai-section" id="ai-demand"><div class="ai-loading"><div class="ai-spinner"></div>正在起草催告函…</div></div>
+    </div>
+  </div>
+
+</main>
+</div><!-- /tabIntake -->
+
+<!-- ===== DASHBOARD TAB ===== -->
+<div id="tabDashboard" class="tab-panel">
+<div class="main">
+
+  <div class="dash-toolbar">
+    <h2>案件看板</h2>
+    <div style="display:flex;gap:6px;flex-wrap:wrap" id="filterBtns">
+      <button class="filter-btn active" onclick="filterDash('all',this)">全部</button>
+      <button class="filter-btn" onclick="filterDash('新建',this)">新建</button>
+      <button class="filter-btn" onclick="filterDash('跟进中',this)">跟进中</button>
+      <button class="filter-btn" onclick="filterDash('已立案',this)">已立案</button>
+      <button class="filter-btn" onclick="filterDash('已结案',this)">已结案</button>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="switchTab('intake')">+ 新案登记</button>
+  </div>
+
+  <div class="card" style="overflow-x:auto">
+    <div id="dashContent">
+      <div class="empty-dash">
+        <div class="empty-dash-icon">📂</div>
+        <p>暂无案件记录<br><small style="color:var(--gray-400)">完成新案登记后，案件将自动出现在这里</small></p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /tabDashboard -->
+
+<!-- ===== CASE DETAIL DRAWER ===== -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDrawer(event)">
+  <div class="detail-drawer" id="detailDrawer">
+    <div class="drawer-header">
+      <h3 id="drawerTitle">案件详情</h3>
+      <select class="status-select" id="drawerStatus" onchange="updateCaseStatus()"></select>
+      <button class="drawer-close" onclick="closeDrawerBtn()">×</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </div>
+</div>
+
 <script>
-function showPage(id, el) {
-  document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (el) el.classList.add('active');
-  const titles = {
-    dashboard:'工作台', cases:'案件管理', docs:'档案库',
-    ai:'AI 分析报告', drafting:'文书起草', contracts:'合同审查',
-    lawdb:'法条检索', labor:'劳动争议', ip:'知识产权',
-    compliance:'法规动态', analytics:'数据统计', settings:'系统设置'
+let currentStep = 1;
+let selectedType = '';
+const typeLabels = {civil:'民事案件',criminal:'刑事案件',commercial:'商事案件',admin:'行政案件'};
+
+function selectType(el, type) {
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedType = type;
+  document.getElementById('step1Next').disabled = false;
+}
+
+function goStep(n) {
+  document.getElementById('step' + currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step' + n).classList.add('active');
+  updateProgress(n);
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  if (n === 3) showConditionalPanels();
+  if (n === 4) showUploadPanels();
+  if (n === 5) buildSummary();
+}
+
+function updateProgress(n) {
+  document.querySelectorAll('.step[data-step]').forEach(el => {
+    const s = parseInt(el.getAttribute('data-step'));
+    el.classList.remove('active','done');
+    if (s < n) el.classList.add('done');
+    if (s === n) el.classList.add('active');
+    // update dot text
+    const dot = el.querySelector('.step-dot');
+    if (s < n) dot.textContent = '✓';
+    else dot.textContent = s;
+  });
+  // update connector lines
+  const lines = document.querySelectorAll('.step-line');
+  lines.forEach((ln, i) => {
+    ln.style.background = (i < n - 1) ? 'var(--green)' : 'var(--gray-200)';
+  });
+}
+
+function showConditionalPanels() {
+  const panels = ['civil','criminal','commercial','admin'];
+  panels.forEach(t => {
+    const el = document.getElementById('cp-' + t + '-details');
+    if (el) el.classList.toggle('show', t === selectedType);
+  });
+  // opp panels
+  document.getElementById('cp-commercial-opp').classList.toggle('show', selectedType === 'commercial');
+  document.getElementById('cp-admin-opp').classList.toggle('show', selectedType === 'admin');
+}
+
+function showUploadPanels() {
+  document.getElementById('cp-upload-contract').classList.toggle('show', selectedType === 'civil' || selectedType === 'commercial');
+  document.getElementById('cp-upload-criminal').classList.toggle('show', selectedType === 'criminal');
+  document.getElementById('cp-upload-admin').classList.toggle('show', selectedType === 'admin');
+  const hints = {
+    civil:'请上传合同文件、付款凭证、通讯记录、裁定文书等',
+    criminal:'请上传司法文书、当事人身份证明、相关证据等',
+    commercial:'请上传合同文件、公司登记资料、往来函件等',
+    admin:'请上传行政文书、相关证据材料等'
   };
-  document.getElementById('page-title').textContent = titles[id] || id;
+  document.getElementById('upload-hint-text').textContent = hints[selectedType] || '';
 }
 
-function openDrawer() {
-  document.getElementById('drawer-overlay').classList.add('open');
+function triggerUpload(id) { document.getElementById(id).click(); }
+
+function handleUpload(input, listId) {
+  const list = document.getElementById(listId);
+  Array.from(input.files).forEach(f => {
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    const size = f.size < 1024*1024 ? (f.size/1024).toFixed(0)+'KB' : (f.size/1024/1024).toFixed(1)+'MB';
+    item.innerHTML = `<span class="file-item-icon">📄</span><span class="file-item-name">${f.name}</span><span class="file-item-size">${size}</span><button class="file-item-del" onclick="this.parentNode.remove()">×</button>`;
+    list.appendChild(item);
+  });
+  input.value = '';
 }
 
-function closeDrawer(e) {
-  if (!e || e.target === document.getElementById('drawer-overlay')) {
-    document.getElementById('drawer-overlay').classList.remove('open');
+function setError(fgId, show) {
+  const fg = document.getElementById(fgId);
+  if (!fg) return;
+  fg.classList.toggle('has-error', show);
+}
+
+function validateStep2() {
+  let ok = true;
+  const checks = [
+    ['fg-name','f-name'],['fg-idtype','f-idtype'],['fg-idno','f-idno']
+  ];
+  checks.forEach(([fg, fid]) => {
+    const v = document.getElementById(fid).value.trim();
+    setError(fg, !v);
+    if (!v) ok = false;
+  });
+  const phone = document.getElementById('f-phone').value.trim();
+  const phoneOk = /^1[3-9]\d{9}$/.test(phone) || phone.length >= 6;
+  document.getElementById('f-phone').closest('.form-group').classList.toggle('has-error', !phoneOk);
+  if (!phoneOk) ok = false;
+  if (ok) goStep(3);
+  else document.querySelector('.has-error')?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function validateStep3() {
+  let ok = true;
+  const date = document.getElementById('f-incident-date').value;
+  const facts = document.getElementById('f-facts').value.trim();
+  if (!facts) { setError('fg-facts', true); ok = false; }
+  else setError('fg-facts', false);
+  if (ok) goStep(4);
+  else document.querySelector('.has-error')?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function buildSummary() {
+  const g = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+  const roleMap = {plaintiff:'原告/申请人',defendant:'被告/被申请人',third:'第三人',
+    criminal_defendant:'刑事被告人家属',victim:'受害人/被害人',company:'企业法人代表'};
+  const html = `
+    <div class="summary-section">
+      <div class="summary-title">案件基本信息</div>
+      <div class="summary-row"><span class="summary-label">案件类型</span><span class="summary-value"><span class="summary-tag">${typeLabels[selectedType]||'—'}</span></span></div>
+    </div>
+    <div class="summary-section">
+      <div class="summary-title">委托人信息</div>
+      <div class="summary-row"><span class="summary-label">姓名/企业名称</span><span class="summary-value">${g('f-name')||'—'}</span></div>
+      <div class="summary-row"><span class="summary-label">证件号码</span><span class="summary-value">${maskId(g('f-idno'))}</span></div>
+      <div class="summary-row"><span class="summary-label">联系电话</span><span class="summary-value">${maskPhone(g('f-phone'))}</span></div>
+      <div class="summary-row"><span class="summary-label">委托人身份</span><span class="summary-value">${roleMap[g('f-role')]||g('f-role')||'—'}</span></div>
+    </div>
+    <div class="summary-section">
+      <div class="summary-title">对方当事人</div>
+      <div class="summary-row"><span class="summary-label">姓名/企业名称</span><span class="summary-value">${g('f-opp-name')||'—'}</span></div>
+    </div>
+    <div class="summary-section">
+      <div class="summary-title">案情概要</div>
+      <div class="summary-row"><span class="summary-label">案件发生时间</span><span class="summary-value">${g('f-incident-date')||'—'}</span></div>
+      <div class="summary-row"><span class="summary-label">发生地点</span><span class="summary-value">${g('f-incident-place')||'—'}</span></div>
+      <div class="summary-row"><span class="summary-label">委托方式</span><span class="summary-value">${g('f-engage-mode')||'—'}</span></div>
+      <div class="summary-row"><span class="summary-label">期望会面时间</span><span class="summary-value">${g('f-meeting-date')||'—'}</span></div>
+      <div class="summary-row"><span class="summary-label">案情陈述</span><span class="summary-value" style="white-space:pre-wrap;line-height:1.6">${truncate(g('f-facts'),120)}</span></div>
+    </div>`;
+  document.getElementById('summaryContent').innerHTML = html;
+}
+
+function maskId(v) {
+  if (!v || v.length < 8) return v || '—';
+  return v.slice(0,3) + '****' + v.slice(-4);
+}
+function maskPhone(v) {
+  if (!v || v.length < 7) return v || '—';
+  return v.slice(0,3) + '****' + v.slice(-4);
+}
+function truncate(s, n) {
+  if (!s) return '—';
+  return s.length > n ? s.slice(0,n) + '…' : s;
+}
+
+function toggleAgree(label) {
+  const cb = document.getElementById('agree-check');
+  setTimeout(() => {
+    document.getElementById('submitBtn').disabled = !cb.checked;
+    label.classList.toggle('checked', cb.checked);
+    label.style.borderColor = cb.checked ? 'var(--blue)' : 'var(--gray-200)';
+    label.style.background = cb.checked ? 'var(--sky)' : '';
+  }, 0);
+}
+
+function submitForm() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '提交中…';
+  const now = new Date();
+  const yy = now.getFullYear();
+  const seq = Math.floor(Math.random()*900000+100000);
+  const typeCode = {civil:'MS',criminal:'XS',commercial:'SS',admin:'XZ'}[selectedType]||'OT';
+  const caseNo = `ZF-${yy}-${typeCode}${seq}`;
+  const payload = buildSubmitPayload(caseNo);
+  // Save to localStorage
+  saveCase({ ...payload, status: '新建', ai_briefing: null, ai_risks: [], ai_risk_level: '未评估', ai_demand: null });
+  console.log('[智法档案] 提交 payload:', JSON.stringify(payload, null, 2));
+  setTimeout(() => {
+    document.getElementById('caseNumberDisplay').textContent = caseNo;
+    goStep(6);
+    // Run AI analysis if API key is configured
+    if (getApiKey()) runAiAnalysis(payload, caseNo);
+  }, 1200);
+}
+
+function toggleIdType() {}
+
+// ─── API Key ──────────────────────────────────────────────────────────────────
+function getApiKey() { return localStorage.getItem('ds_api_key') || ''; }
+function saveApiKey() {
+  const v = document.getElementById('apiKeyInput').value.trim();
+  if (!v) return;
+  localStorage.setItem('ds_api_key', v);
+  document.getElementById('apiBar').classList.add('configured');
+  const msg = document.getElementById('apiBarMsg');
+  msg.style.display = 'inline';
+  setTimeout(() => msg.style.display = 'none', 2000);
+}
+function initApiBar() {
+  if (getApiKey()) {
+    document.getElementById('apiBar').classList.add('configured');
   }
 }
 
-function switchTab(el, tabId) {
-  document.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.querySelectorAll('.drawer-body').forEach(b => b.style.display = 'none');
-  document.getElementById(tabId).style.display = 'block';
+// ─── Tab switching ────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tabIntake').classList.toggle('active', name === 'intake');
+  document.getElementById('tabDashboard').classList.toggle('active', name === 'dashboard');
+  document.getElementById('tab-intake').classList.toggle('active', name === 'intake');
+  document.getElementById('tab-dashboard').classList.toggle('active', name === 'dashboard');
+  if (name === 'dashboard') renderDashboard();
 }
 
-// filter buttons
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    this.closest('.filter-row').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
+// ─── AI sub-tabs ──────────────────────────────────────────────────────────────
+function switchAiTab(name, btn) {
+  document.querySelectorAll('.ai-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.ai-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('ai-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── Case localStorage ────────────────────────────────────────────────────────
+const CASES_KEY = 'lawfirm_cases';
+const STATUS_OPTIONS = ['新建','跟进中','已立案','已结案'];
+const STATUS_CLASS = {'新建':'status-new','跟进中':'status-follow','已立案':'status-filed','已结案':'status-closed'};
+
+function getCases() {
+  try { return JSON.parse(localStorage.getItem(CASES_KEY) || '{}'); } catch { return {}; }
+}
+function saveCase(c) {
+  const all = getCases();
+  all[c.case_number] = c;
+  localStorage.setItem(CASES_KEY, JSON.stringify(all));
+  updateDashBadge();
+}
+function updateDashBadge() {
+  const n = Object.keys(getCases()).length;
+  const badge = document.getElementById('dashBadge');
+  badge.textContent = n;
+  badge.style.display = n ? 'inline' : 'none';
+}
+
+// ─── Dashboard rendering ──────────────────────────────────────────────────────
+let dashFilter = 'all';
+function filterDash(f, btn) {
+  dashFilter = f;
+  document.querySelectorAll('#filterBtns .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDashboard();
+}
+
+function renderDashboard() {
+  const all = getCases();
+  let cases = Object.values(all).sort((a, b) => b.submitted_at.localeCompare(a.submitted_at));
+  if (dashFilter !== 'all') cases = cases.filter(c => c.status === dashFilter);
+  const el = document.getElementById('dashContent');
+  if (!cases.length) {
+    el.innerHTML = `<div class="empty-dash"><div class="empty-dash-icon">📂</div><p>暂无${dashFilter === 'all' ? '' : dashFilter + ''}案件</p></div>`;
+    return;
+  }
+  const rows = cases.map(c => {
+    const risk = c.ai_risk_level || '未评估';
+    const riskCls = risk === '高' ? 'risk-high' : risk === '中' ? 'risk-med' : 'risk-low';
+    return `<tr onclick="openDrawer('${c.case_number}')">
+      <td><strong style="color:var(--navy)">${c.case_number}</strong></td>
+      <td>${c.principal?.name || '-'}</td>
+      <td>${typeLabels[c.case_type] || c.case_type}</td>
+      <td><span class="status-badge ${STATUS_CLASS[c.status] || 'status-new'}">${c.status || '新建'}</span></td>
+      <td><span class="risk-dot ${riskCls}"></span>${risk}</td>
+      <td style="color:var(--gray-400)">${c.submitted_at.slice(0,10)}</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table class="case-table">
+    <thead><tr><th>案件编号</th><th>当事人</th><th>类型</th><th>状态</th><th>风险</th><th>登记日期</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// ─── Case detail drawer ───────────────────────────────────────────────────────
+let currentDrawerCase = null;
+function openDrawer(caseNo) {
+  const c = getCases()[caseNo];
+  if (!c) return;
+  currentDrawerCase = caseNo;
+  document.getElementById('drawerTitle').textContent = caseNo;
+
+  const sel = document.getElementById('drawerStatus');
+  sel.innerHTML = STATUS_OPTIONS.map(s => `<option${c.status === s ? ' selected' : ''}>${s}</option>`).join('');
+
+  document.getElementById('drawerBody').innerHTML = buildDrawerBody(c);
+  document.getElementById('detailOverlay').classList.add('open');
+}
+function closeDrawer(e) { if (e.target === document.getElementById('detailOverlay')) closeDrawerBtn(); }
+function closeDrawerBtn() {
+  document.getElementById('detailOverlay').classList.remove('open');
+  currentDrawerCase = null;
+}
+function updateCaseStatus() {
+  if (!currentDrawerCase) return;
+  const all = getCases();
+  all[currentDrawerCase].status = document.getElementById('drawerStatus').value;
+  localStorage.setItem(CASES_KEY, JSON.stringify(all));
+  renderDashboard();
+}
+
+function buildDrawerBody(c) {
+  const typeLabel = typeLabels[c.case_type] || c.case_type;
+  const briefing = c.ai_briefing ? `<div class="drawer-section"><div class="drawer-section-title">AI 案情摘要</div><div class="ai-text" style="font-size:13px">${escHtml(c.ai_briefing)}</div></div>` : '';
+  const demand = c.ai_demand ? `<div class="drawer-section"><div class="drawer-section-title">催告函草稿</div><div class="demand-letter">${escHtml(c.ai_demand)}</div><div class="ai-actions"><button class="btn btn-outline btn-sm" onclick="copyText('${encodeURIComponent(c.ai_demand || '')}')">复制全文</button></div></div>` : '';
+  const risks = c.ai_risks?.length ? `<div class="drawer-section"><div class="drawer-section-title">风险提示</div>${c.ai_risks.map(r => `<div class="risk-item"><span class="risk-level-tag risk-${r.level === '高' ? 'high' : r.level === '中' ? 'med' : 'low'}-tag">${r.level}风险</span><div class="risk-desc">${escHtml(r.desc)}</div></div>`).join('')}</div>` : '';
+
+  return `
+    <div class="drawer-section">
+      <div class="drawer-section-title">案件基本信息</div>
+      <div class="info-grid">
+        <div class="info-row"><span class="info-label">案件类型</span><span class="info-val">${typeLabel}</span></div>
+        <div class="info-row"><span class="info-label">登记时间</span><span class="info-val">${c.submitted_at.slice(0,16).replace('T',' ')}</span></div>
+        <div class="info-row"><span class="info-label">当事人</span><span class="info-val">${c.principal?.name || '-'}</span></div>
+        <div class="info-row"><span class="info-label">联系电话</span><span class="info-val">${c.principal?.phone || '-'}</span></div>
+        <div class="info-row"><span class="info-label">对方当事人</span><span class="info-val">${c.opponent?.name || '-'}</span></div>
+        <div class="info-row"><span class="info-label">事发日期</span><span class="info-val">${c.incident?.date || '-'}</span></div>
+      </div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">案情陈述</div>
+      <div class="ai-text" style="font-size:13px;background:var(--gray-50);padding:12px;border-radius:6px">${escHtml(c.incident?.facts || '（未填写）')}</div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">诉讼请求</div>
+      <div style="font-size:13px;color:var(--gray-800)">${escHtml(c.incident?.claim || '（未填写）')}</div>
+    </div>
+    ${briefing}${risks}${demand}
+    ${!c.ai_briefing ? `<button class="btn btn-primary btn-sm" onclick="runAiFromDrawer('${c.case_number}')">🤖 生成AI分析</button>` : ''}
+  `;
+}
+
+function copyText(encoded) {
+  navigator.clipboard.writeText(decodeURIComponent(encoded)).catch(() => {});
+}
+function escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── AI Analysis ──────────────────────────────────────────────────────────────
+async function runAiAnalysis(payload, caseNo) {
+  const key = getApiKey();
+  if (!key) {
+    document.getElementById('aiPanel').style.display = 'none';
+    return;
+  }
+  document.getElementById('aiPanel').style.display = 'block';
+
+  const caseTypeName = typeLabels[payload.case_type] || payload.case_type;
+  const factsText = payload.incident?.facts || '';
+  const claimText = payload.incident?.claim || '';
+  const principalName = payload.principal?.name || '当事人';
+  const opponentName = payload.opponent?.name || '对方当事人';
+
+  const sysPrompt = `你是一名中国资深律师助理，擅长案件分析与法律文书起草。所有输出仅供律师参考审阅，不构成法律意见，不得直接作为法律依据。`;
+
+  async function askDS(userMsg) {
+    const r = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [{ role: 'system', content: sysPrompt }, { role: 'user', content: userMsg }],
+        temperature: 0.4
+      })
+    });
+    const d = await r.json();
+    return d.choices?.[0]?.message?.content || '（生成失败）';
+  }
+
+  const caseCtx = `案件类型：${caseTypeName}
+当事人：${principalName}（${payload.principal?.role || '原告/申请人'}）
+对方当事人：${opponentName}
+案情事实：${factsText}
+诉讼请求：${claimText}
+事发日期：${payload.incident?.date || '未知'}`;
+
+  // 1. Briefing
+  const briefingPromise = askDS(`${caseCtx}\n\n请用300字以内对上述案件出具案情摘要，包括：争议焦点、关键法律关系、初步法律定性。`).then(text => {
+    document.getElementById('ai-briefing').innerHTML = `<div class="ai-text">${escHtml(text)}</div><div class="ai-actions"><button class="btn btn-outline btn-sm" onclick="copyText('${encodeURIComponent(text)}')">复制</button></div>`;
+    return text;
   });
-});
+
+  // 2. Timeline
+  const timelinePromise = askDS(`${caseCtx}\n\n从案情事实中提取关键时间节点，以JSON数组返回，格式：[{"date":"YYYY-MM-DD或描述","event":"事件内容"}]，不要有其他文字。`).then(text => {
+    try {
+      const arr = JSON.parse(text.replace(/```json|```/g, '').trim());
+      document.getElementById('ai-timeline').innerHTML = arr.map(t =>
+        `<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">${escHtml(t.date)}</div><div class="timeline-event">${escHtml(t.event)}</div></div>`
+      ).join('');
+    } catch {
+      document.getElementById('ai-timeline').innerHTML = `<div class="ai-text">${escHtml(text)}</div>`;
+    }
+    return text;
+  });
+
+  // 3. Risks
+  const risksPromise = askDS(`${caseCtx}\n\n从法律角度列出3-5个主要风险点，以JSON数组返回，格式：[{"level":"高|中|低","desc":"风险描述"}]，不要有其他文字。`).then(text => {
+    let parsed = [];
+    try {
+      parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+      document.getElementById('ai-risks').innerHTML = parsed.map(r =>
+        `<div class="risk-item"><span class="risk-level-tag risk-${r.level==='高'?'high':r.level==='中'?'med':'low'}-tag">${r.level}风险</span><div class="risk-desc">${escHtml(r.desc)}</div></div>`
+      ).join('');
+    } catch {
+      document.getElementById('ai-risks').innerHTML = `<div class="ai-text">${escHtml(text)}</div>`;
+    }
+    const riskLevel = parsed.some(r => r.level === '高') ? '高' : parsed.some(r => r.level === '中') ? '中' : '低';
+    return { text, parsed, riskLevel };
+  });
+
+  // 4. Demand letter (only for civil/commercial)
+  const needDemand = ['civil', 'commercial'].includes(payload.case_type);
+  const demandPromise = needDemand
+    ? askDS(`${caseCtx}\n\n请代表${principalName}向${opponentName}起草一份正式的律师催告函（非诉讼阶段）。格式：标题、正文（事实+法律依据+要求+期限）、落款。语言严谨，符合中国法律文书规范。`)
+      .then(text => {
+        document.getElementById('ai-demand').innerHTML = `<div class="demand-letter">${escHtml(text)}</div><div class="ai-actions"><button class="btn btn-outline btn-sm" onclick="copyText('${encodeURIComponent(text)}')">复制全文</button></div>`;
+        return text;
+      })
+    : Promise.resolve(null).then(() => {
+        document.getElementById('ai-demand').innerHTML = `<div style="color:var(--gray-400);font-size:13px;padding:12px 0">当前案件类型（${caseTypeName}）暂不自动生成催告函。</div>`;
+        return null;
+      });
+
+  // Save results to localStorage
+  const [briefingText, , risksData, demandText] = await Promise.all([briefingPromise, timelinePromise, risksPromise, demandPromise]);
+  const all = getCases();
+  if (all[caseNo]) {
+    all[caseNo].ai_briefing = briefingText;
+    all[caseNo].ai_risks = risksData?.parsed || [];
+    all[caseNo].ai_risk_level = risksData?.riskLevel || '未评估';
+    all[caseNo].ai_demand = demandText;
+    localStorage.setItem(CASES_KEY, JSON.stringify(all));
+  }
+}
+
+async function runAiFromDrawer(caseNo) {
+  const c = getCases()[caseNo];
+  if (!c) return;
+  switchTab('intake');
+  goStep(6);
+  document.getElementById('caseNumberDisplay').textContent = caseNo;
+  await runAiAnalysis(c, caseNo);
+  // Refresh drawer
+  document.getElementById('drawerBody').innerHTML = buildDrawerBody(getCases()[caseNo]);
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+initApiBar();
+updateDashBadge();
+
+// Entity types used by the backend OCR+NER pipeline when processing submitted
+// documents. Matches preset_entity_types.json from DataInfra-RedactionEverything.
+// The backend reads this schema to know which fields to extract from scanned docs.
+const NER_SCHEMA = {
+  // Universal PII
+  PERSON:          { name:'姓名',         domain:'pii',                  regex: null },
+  ID_CARD:         { name:'身份证号',      domain:'pii',                  regex: /\b\d{17}[\dXx]\b/ },
+  PASSPORT:        { name:'护照号',        domain:'pii',                  regex: /[EeGgHhDd]\d{8}/ },
+  PHONE:           { name:'电话',          domain:'pii',                  regex: /1[3-9]\d{9}/ },
+  EMAIL:           { name:'邮箱',          domain:'pii',                  regex: /[\w.+-]+@[\w-]+\.\w+/ },
+  ADDRESS:         { name:'地址',          domain:'address_location',     regex: null },
+  DATE:            { name:'日期',          domain:'time_event',           regex: null },
+  AMOUNT:          { name:'金额',          domain:'account_transaction',  regex: null },
+  BANK_CARD:       { name:'银行卡号',      domain:'account_transaction',  regex: null },
+  BANK_ACCOUNT:    { name:'银行账号',      domain:'account_transaction',  regex: null },
+  CREDIT_CODE:     { name:'统一社会信用代码', domain:'organization_subject', regex: /[0-9A-Z]{18}/ },
+  LICENSE_PLATE:   { name:'车牌号',        domain:'asset_resource',       regex: /[一-龥][A-Z][A-Z0-9]{5}/ },
+  // Organization
+  COMPANY_NAME:    { name:'公司名称',      domain:'organization_subject', regex: null },
+  GOVERNMENT_AGENCY:{ name:'机关单位',     domain:'organization_subject', regex: null },
+  // Legal-specific (order 410-480 from DataInfra preset)
+  LEGAL_PLAINTIFF:  { name:'原告',         domain:'pii',                  regex: null },
+  LEGAL_DEFENDANT:  { name:'被告',         domain:'pii',                  regex: null },
+  LEGAL_THIRD_PARTY:{ name:'第三人',       domain:'pii',                  regex: null },
+  LEGAL_COURT:      { name:'法院',         domain:'organization_subject', regex: null },
+  LEGAL_CASE_ID:    { name:'案号',         domain:'document_record',      regex: /[（(]\d{4}[）)][^\s]{2,30}[号]/ },
+  LEGAL_ATTORNEY:   { name:'代理律师',     domain:'pii',                  regex: null },
+  LEGAL_LAW_FIRM:   { name:'律所',         domain:'organization_subject', regex: null },
+  LEGAL_CLAIM:      { name:'诉讼请求',     domain:'document_record',      regex: null },
+  CRIMINAL_RECORD:  { name:'法律记录',     domain:'pii',                  regex: null },
+  CASE_NUMBER:      { name:'编号',         domain:'custom_extension',     regex: null },
+};
+
+// NER presets per case type — tells backend which entity types to prioritize
+const NER_PRESETS = {
+  civil:      ['PERSON','ID_CARD','PHONE','ADDRESS','DATE','AMOUNT','BANK_CARD','BANK_ACCOUNT',
+               'COMPANY_NAME','LEGAL_PLAINTIFF','LEGAL_DEFENDANT','LEGAL_COURT','LEGAL_CASE_ID',
+               'LEGAL_ATTORNEY','LEGAL_LAW_FIRM','LEGAL_CLAIM','CASE_NUMBER'],
+  criminal:   ['PERSON','ID_CARD','PHONE','ADDRESS','DATE','GOVERNMENT_AGENCY','LEGAL_DEFENDANT',
+               'LEGAL_ATTORNEY','LEGAL_LAW_FIRM','LEGAL_COURT','LEGAL_CASE_ID','CRIMINAL_RECORD'],
+  commercial: ['PERSON','ID_CARD','PHONE','ADDRESS','DATE','AMOUNT','BANK_CARD','BANK_ACCOUNT',
+               'BANK_NAME','COMPANY_NAME','CREDIT_CODE','GOVERNMENT_AGENCY','LEGAL_PLAINTIFF',
+               'LEGAL_DEFENDANT','LEGAL_COURT','LEGAL_CASE_ID','LEGAL_CLAIM','CASE_NUMBER'],
+  admin:      ['PERSON','ID_CARD','PHONE','ADDRESS','DATE','GOVERNMENT_AGENCY','COMPANY_NAME',
+               'LEGAL_PLAINTIFF','LEGAL_COURT','LEGAL_CASE_ID','LEGAL_CLAIM','CASE_NUMBER'],
+};
+
+// Visual feature types to detect in uploaded scanned documents
+const VISUAL_PRESETS = {
+  civil:      ['official_seal','signature','id_card'],
+  criminal:   ['official_seal','signature','id_card','face'],
+  commercial: ['official_seal','signature','id_card','bank_card','qr_code'],
+  admin:      ['official_seal','signature','id_card'],
+};
+
+// Build structured submission payload — consumed by backend archive pipeline
+function buildSubmitPayload(caseNo) {
+  const g = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  return {
+    case_number: caseNo,
+    case_type: selectedType,
+    submitted_at: new Date().toISOString(),
+    // NER pipeline config for uploaded documents
+    ner_config: {
+      entity_types: NER_PRESETS[selectedType] || NER_PRESETS.civil,
+      visual_features: VISUAL_PRESETS[selectedType] || [],
+      ocr_enabled: true,            // PP-StructureV3 for scanned docs
+      has_text_enabled: true,       // HaS semantic NER
+      regex_fallback: true,         // regex for ID card / phone / case number
+    },
+    // Parties (maps to LEGAL_PLAINTIFF / LEGAL_DEFENDANT in NER Schema)
+    principal: {
+      name: g('f-name'),
+      id_type: g('f-idtype'),
+      id_number: g('f-idno'),
+      phone: g('f-phone'),
+      email: g('f-email'),
+      role: g('f-role'),
+      address: g('f-addr'),
+    },
+    opponent: {
+      name: g('f-opp-name'),
+      contact: g('f-opp-contact'),
+      uscc: g('f-opp-uscc') || null,
+      legal_rep: g('f-opp-legal-rep') || null,
+    },
+    // Case facts
+    incident: {
+      date: g('f-incident-date'),
+      place: g('f-incident-place'),
+      facts: g('f-facts'),
+      claim: g('f-claim'),
+      extra: g('f-extra'),
+    },
+    // Type-specific fields
+    civil_ext: selectedType === 'civil' ? {
+      dispute_type: g('f-civil-type'),
+      amount: g('f-civil-amount'),
+      prior_judgment: g('f-civil-prior'),
+      evidence_status: g('f-civil-evidence'),
+    } : null,
+    criminal_ext: selectedType === 'criminal' ? {
+      custody_status: g('f-crim-status'),
+      charge: g('f-crim-charge'),
+      meeting_done: g('f-crim-meet'),
+      detention_location: g('f-crim-location'),
+    } : null,
+    commercial_ext: selectedType === 'commercial' ? {
+      dispute_type: g('f-comm-type'),
+      contract_exists: g('f-comm-contract'),
+      amount: g('f-comm-amount'),
+      prior_proceeding: g('f-comm-prior'),
+    } : null,
+    admin_ext: selectedType === 'admin' ? {
+      admin_act_date: g('f-admin-date'),
+      reconsideration: g('f-admin-reconsider'),
+      doc_number: g('f-admin-docno'),
+      organ: g('f-admin-organ'),
+      act_type: g('f-admin-act-type'),
+    } : null,
+    // Engagement
+    engagement: {
+      mode: g('f-engage-mode'),
+      preferred_date: g('f-meeting-date'),
+    },
+  };
+}
 </script>
 </body>
 </html>
